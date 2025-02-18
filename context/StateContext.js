@@ -3,6 +3,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { onIdTokenChanged } from 'firebase/auth';
 import {auth} from '@/backend/Firebase'
 
+//comment
+
 const Context = createContext();
 
 export const StateContext = ({ children }) => {
