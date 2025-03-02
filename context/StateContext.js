@@ -19,7 +19,7 @@ export const StateContext = ({ children }) => {
 
   // AUTHENTICATION REMEMBER ME USEEFFECT
    useEffect(() => {
-     const unsubscribe = onIdTokenChanged(auth, (user) => {s
+     const unsubscribe = onIdTokenChanged(auth, (user) => {
        if(user){
          console.log('Token or user state changed:', user)
          user.getIdToken().then((token) => {

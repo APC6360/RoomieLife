@@ -23,7 +23,7 @@ const Hero = ({text}) => {
 };
 
 const Section = styled.section`
-background-color: blue;
+
 width: 100%;
 height: 10vh;
 `;
