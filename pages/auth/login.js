@@ -13,8 +13,15 @@ const Login = () => {
 
   const router = useRouter()
 
+ 
 
   async function handleLogin(){
+    try{
+        await login(email, password, setUser)
+        router.push('/dashboard')
+    }catch(err){
+        console.log('Error Logging In', err)
+    }
 
   }
 

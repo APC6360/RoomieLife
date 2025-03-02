@@ -5,20 +5,37 @@ import { logOut } from '@/backend/Auth';
 import { useStateContext } from '@/context/StateContext';
 import Home from '@/components/Dashboard/Home'
 const Navbar = () => {
-  const { setUser } = useStateContext()
+  const { user, setUser } = useStateContext()
+
+  const handleLogout = async() => {
+    await logOut(setUser);
+    
+  };
 
   return (
     
     <Nav>
       <LeftSide>
         <Home></Home>
-      <RoomieLife href="/dashboard">RoomieLife</RoomieLife>
+      <RoomieLife href="/">RoomieLife</RoomieLife>
       </LeftSide>
       <NavLinks>
-        <ButtonLink href="/dashboard">Dashboard</ButtonLink>
+        {user ? (
+          <>
+          <ButtonLink href="/dashboard">Dashboard</ButtonLink>
+          <ButtonLink href='/chores/choresmain'>Chores</ButtonLink>
+          <ButtonLinkasButton onClick={handleLogout}>Logout</ButtonLinkasButton>
+          </>
+        ) : (
+          <>
+          <ButtonLink href="/auth/signup">Sign Up</ButtonLink>
+          <ButtonLink href="/auth/login">Login</ButtonLink>
+          </>
+        )}
+        
         <ButtonLink href="/about">About</ButtonLink>
-        <ButtonLink href="/auth/signup">Sign Up</ButtonLink>
-        <ButtonLink href="/auth/login">Login</ButtonLink>
+        
+        
       </NavLinks>
     </Nav>
   );
@@ -74,7 +91,21 @@ transition: background-color .3s ease-in-out;
 text-decoration: none;
 
 &:hover {
-  
+  background-color: #F5F7FA;
+  color: #ff6b6b;
+  font-weight: bold
+}
+`;
+const ButtonLinkasButton = styled.button`
+color: black;
+background-color: #ff6b6b;
+padding: 0.5rem 1rem;
+border-radius: 4px;
+transition: background-color .3s ease-in-out;
+text-decoration: none;
+font-family: 'Gill Sans MT';
+
+&:hover {
   background-color: #F5F7FA;
   color: #ff6b6b;
   font-weight: bold

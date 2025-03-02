@@ -25,13 +25,17 @@ const Dashboard = () => {
 
 
   return (
+    <><>
+      <Navbar />
+    </>
     <Section>
-      {/* <TopHeader>
-        Dashboard
-      </TopHeader> */}
+
+        {/* <TopHeader>
+      Dashboard
+    </TopHeader> */}
 
 
-    </Section>
+      </Section></>
   )
 }
 

@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 const Home = () => {
   return (
-    <Square href="/dashboard">
+    <Square href="/">
       <IoMdHome />
     </Square>
   );

@@ -7,7 +7,7 @@ import Link from 'next/link'
 import Navbar from '@/components/Dashboard/Navbar'
 const Signup = () => {
 
-  const { user, setUser } = useStateContext()
+  const {user, setUser } = useStateContext()
   const [ email, setEmail ] = useState('')
   const [ password, setPassword ] = useState('')
 
@@ -31,7 +31,7 @@ const Signup = () => {
   async function handleSignup(){
     const isValidEmail = await validateEmail()
     // console.log('isValidEmail', isValidEmail)
-    // if(!isValidEmail){ return; }
+    if(!isValidEmail){ return; }
     
     try{
         await register(email, password, setUser)
