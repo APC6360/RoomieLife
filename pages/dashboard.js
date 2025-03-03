@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react'
 import { styled } from 'styled-components'
 import Navbar from "@/components/Dashboard/Navbar"
 import Link from 'next/link'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, query, where, collection, getDocs } from 'firebase/firestore'
 import { database } from '@/backend/Firebase'
 import { useStateContext } from '@/context/StateContext'
 
@@ -11,12 +11,26 @@ export default function Dashboard() {
   const { user } = useStateContext()
   const [roommates, setRoommates] = useState([])
   const [roommateCount, setRoommateCount] = useState(0)
+  const [choreCount, setChoreCount] = useState(0)
+  const [expenseCount, setExpenseCount] = useState(0)
 
   useEffect(() => {
     if (user) {
       fetchRoommateData()
+      fetchChoreData()
     }
   }, [user])
+
+  const fetchChoreData = async () => {
+    try {
+      const choresRef = collection(database, 'sharedChores')
+      const q = query (choresRef, where('assigneeId','==', user.uid), where('completed', '==', false))
+      const querySnapshot = await getDocs(q)
+      setChoreCount(querySnapshot.size)
+    } catch (err) {
+      console.error('Error fetching chore data:', err)
+    }
+  }
 
   const fetchRoommateData = async () => {
     try {
@@ -86,14 +100,14 @@ export default function Dashboard() {
               <CardIcon>✔️</CardIcon>
               <CardTitle>Chores</CardTitle>
               <CardDescription>Track and manage household responsibilities</CardDescription>
-              <CardButton href="/chores/choresmain">Manage Chores</CardButton>
+              <CardButton href="/Roommate/choresmain">Manage Chores</CardButton>
             </DashboardCard>
 
             <DashboardCard>
               <CardIcon>💰</CardIcon>
               <CardTitle>Expenses</CardTitle>
               <CardDescription>Track shared expenses and payments</CardDescription>
-              <CardButton href="/expense.js">Manage Expenses</CardButton>
+              <CardButton href="/Roommate/expense.js">Manage Expenses</CardButton>
             </DashboardCard>
           </DashboardCards>
 
@@ -102,7 +116,7 @@ export default function Dashboard() {
             <SummaryBox>
               <SummaryItem>
                 <SummaryLabel>Upcoming Chores</SummaryLabel>
-                <SummaryValue>3</SummaryValue>
+                <SummaryValue>{choreCount}</SummaryValue>
               </SummaryItem>
               <SummaryItem>
                 <SummaryLabel>Pending Expenses</SummaryLabel>

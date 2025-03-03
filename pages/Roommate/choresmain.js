@@ -231,7 +231,7 @@ const Chores = () => {
                         </ChoreDescription>
                         <ChoreMetadata>
                           <ChoreAssignee>
-                            Assigned to: {user && chore.assigneeId === user.uid ? 'Me' : chore.assigneeName}
+                          Assigned to: {chore.assigneeId === user?.uid ? 'Me' : chore.assigneeName}
                           </ChoreAssignee>
                           {chore.dueDate && 
                             <ChoreDueDate>
@@ -545,7 +545,6 @@ const RoommateChoreCount = styled.p`
 `;
 
 const EmptyRoommateMessage = styled.div`
-  
   text-align: center;
   color: rgba(255, 255, 255, 0.5);
   padding: 20px;

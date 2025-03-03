@@ -31,7 +31,7 @@ const Navbar = () => {
           <ButtonLink href="/auth/profile">Profile</ButtonLink>
           <ButtonLink href="/dashboard">Dashboard</ButtonLink>
           <ButtonLink href="/Roommate/roommatematching">Roommate Matching</ButtonLink>
-          <ButtonLink href='/chores/choresmain'>Chores</ButtonLink>
+          <ButtonLink href='/Roommate/choresmain'>Chores</ButtonLink>
           <ButtonLinkasButton onClick={handleLogout}>Logout</ButtonLinkasButton>
           </>
         ) : (
