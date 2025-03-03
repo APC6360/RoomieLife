@@ -118,6 +118,45 @@ const Profile = () => {
                 </InfoRow>
               </ProfileInfoSection>
               
+              {/* Lifestyle Preferences Section */}
+              <LifestyleSection>
+                <SectionTitle>Lifestyle Preferences</SectionTitle>
+                
+                <PreferencesGrid>
+                  <PreferenceCard>
+                    <PreferenceIcon>🚬</PreferenceIcon>
+                    <PreferenceTitle>Smoking</PreferenceTitle>
+                    <PreferenceValue>
+                      {profileData.lifestylePreferences?.smoking || "Not specified"}
+                    </PreferenceValue>
+                  </PreferenceCard>
+                  
+                  <PreferenceCard>
+                    <PreferenceIcon>🐾</PreferenceIcon>
+                    <PreferenceTitle>Pets</PreferenceTitle>
+                    <PreferenceValue>
+                      {profileData.lifestylePreferences?.pets || "Not specified"}
+                    </PreferenceValue>
+                  </PreferenceCard>
+                  
+                  <PreferenceCard>
+                    <PreferenceIcon>🔊</PreferenceIcon>
+                    <PreferenceTitle>Noise Level</PreferenceTitle>
+                    <PreferenceValue>
+                      {profileData.lifestylePreferences?.noise || "Not specified"}
+                    </PreferenceValue>
+                  </PreferenceCard>
+                  
+                  <PreferenceCard>
+                    <PreferenceIcon>🧹</PreferenceIcon>
+                    <PreferenceTitle>Cleanliness</PreferenceTitle>
+                    <PreferenceValue>
+                      {profileData.lifestylePreferences?.cleanliness || "Not specified"}
+                    </PreferenceValue>
+                  </PreferenceCard>
+                </PreferencesGrid>
+              </LifestyleSection>
+              
               <ButtonsContainer>
                 <EditButton onClick={() => router.push('/auth/createprofile')}>
                   Edit Profile
@@ -152,7 +191,7 @@ const ProfileCard = styled.div`
   border-radius: 16px;
   padding: 40px;
   width: 100%;
-  max-width: 600px;
+  max-width: 700px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 `;
 
@@ -261,6 +300,66 @@ const BiographyText = styled.p`
   padding: 16px;
   border-radius: 8px;
   min-height: 100px;
+`;
+
+// New Lifestyle Preferences Styles
+const LifestyleSection = styled.div`
+  width: 100%;
+  margin-bottom: 32px;
+`;
+
+const SectionTitle = styled.h3`
+  font-size: 22px;
+  color: white;
+  margin-bottom: 24px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 107, 107, 0.3);
+  width: 100%;
+`;
+
+const PreferencesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+  
+  @media (max-width: 580px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const PreferenceCard = styled.div`
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.1);
+  }
+`;
+
+const PreferenceIcon = styled.div`
+  font-size: 28px;
+  margin-bottom: 12px;
+`;
+
+const PreferenceTitle = styled.h4`
+  font-size: 16px;
+  color: #ff6b6b;
+  margin-bottom: 8px;
+  text-align: center;
+`;
+
+const PreferenceValue = styled.p`
+  font-size: 14px;
+  color: white;
+  text-align: center;
+  line-height: 1.4;
 `;
 
 const LoadingMessage = styled.div`

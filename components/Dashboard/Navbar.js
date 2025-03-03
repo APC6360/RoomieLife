@@ -17,13 +17,14 @@ const Navbar = () => {
     <Nav>
       <LeftSide>
         <Home></Home>
-      <RoomieLife href="/dashboard">Roomie<span>Life</span></RoomieLife>
+      <RoomieLife href="/">Roomie<span>Life</span></RoomieLife>
       </LeftSide>
       <NavLinks>
         {user ? (
           <>
           <ButtonLink href="/auth/profile">Profile</ButtonLink>
           <ButtonLink href="/dashboard">Dashboard</ButtonLink>
+          <ButtonLink href="/Roommate/roommatematching">Roommate Matching</ButtonLink>
           <ButtonLink href='/chores/choresmain'>Chores</ButtonLink>
           <ButtonLink href="/about">About</ButtonLink>
           <ButtonLinkasButton onClick={handleLogout}>Logout</ButtonLinkasButton>
