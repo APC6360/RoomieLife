@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { useRouter } from 'next/router'
 import { useStateContext } from '@/context/StateContext'
-import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore'
+import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, getDoc, query, where } from 'firebase/firestore'
 import { database } from '@/backend/Firebase'
 import Navbar from '@/components/Dashboard/Navbar'
 
@@ -13,24 +13,60 @@ const Chores = () => {
   const [newChore, setNewChore] = useState('')
   const [newAssignee, setNewAssignee] = useState('')
   const [newDueDate, setNewDueDate] = useState('')
- 
   const [error, setError] = useState('')
+  const [roommates, setRoommates] = useState([])
+  const [roommateProfiles, setRoommateProfiles] = useState([])
 
-  // Check if user is authenticated
+  
   useEffect(() => {
     if (!user) {
       router.push('/auth/login')
       return
     }
 
-    // Fetch user's chores from Firestore
+    const fetchRoommates = async () => {
+      try {
+        const roommateMatchesRef = doc(database, 'roomateMatches', user.uid)
+        const matchesSnapshot = await getDoc(roommateMatchesRef)
+        
+        if (matchesSnapshot.exists()) {
+          const matchData = matchesSnapshot.data()
+          const roommates = matchData.roommates || []
+          setRoommates([user.uid, ...roommates])
+
+        
+          const profiles = []
+          for (const roommateId of roommates) {
+            const profileRef = doc(database, 'userProfiles', roommateId)
+            const profileSnapshot = await getDoc(profileRef)
+            if (profileSnapshot.exists()) {
+              profiles.push({
+                id: roommateId,
+                ...profileSnapshot.data()
+              })
+            }
+          }
+          setRoommateProfiles(profiles)
+        } else {
+          setRoommates([user.uid])
+        }
+      } catch (err) {
+        console.error('Error fetching roommates:', err)
+        setError('Failed to load roommates. Please try again.')
+      }
+    }
+
+   
     const fetchChores = async () => {
       try {
-        const choresRef = collection(database, 'userChores')
-        const querySnapshot = await getDocs(choresRef)
+        await fetchRoommates()
+        
+        const choresRef = collection(database, 'sharedChores')
+        const q = query(choresRef, where('householdIds', 'array-contains', user.uid))
+        const querySnapshot = await getDocs(q)
+        
         const choresData = querySnapshot.docs
           .map(doc => ({ id: doc.id, ...doc.data() }))
-          .filter(chore => chore.userId === user.uid)
           .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
         
         setChores(choresData)
@@ -43,7 +79,7 @@ const Chores = () => {
     fetchChores()
   }, [user, router])
 
-  // Add a new chore
+  
   const handleAddChore = async () => {
     if (!newChore) {
       setError('Chore description is required')
@@ -51,19 +87,32 @@ const Chores = () => {
     }
 
     try {
+      const assigneeId = newAssignee || user.uid
+
+     
+      let assigneeName = ''
+      if (assigneeId === user.uid) {
+        assigneeName = 'Me'
+      } else {
+        const assignee = roommateProfiles.find(profile => profile.id === assigneeId)
+        assigneeName = assignee ? `${assignee.firstName} ${assignee.lastName}` : 'Unknown'
+      }
+
       const newChoreData = {
         description: newChore,
-        assignee: newAssignee,
+        assigneeId: assigneeId,
+        assigneeName: assigneeName,
         dueDate: newDueDate,
         completed: false,
         createdAt: new Date().toISOString(),
-        userId: user.uid
+        createdBy: user.uid,
+        householdIds: roommates
       }
       
-      const docRef = await addDoc(collection(database, 'userChores'), newChoreData)
+      const docRef = await addDoc(collection(database, 'sharedChores'), newChoreData)
       setChores([...chores, { id: docRef.id, ...newChoreData }])
       
-      // Reset form fields
+      
       setNewChore('')
       setNewAssignee('')
       setNewDueDate('')
@@ -74,15 +123,18 @@ const Chores = () => {
     }
   }
 
-  // Toggle chore completion status
+  
   const toggleChoreStatus = async (id, currentStatus) => {
     try {
-      await updateDoc(doc(database, 'userChores', id), {
+      await updateDoc(doc(database, 'sharedChores', id), {
         completed: !currentStatus
       })
       
       setChores(chores.map(chore => 
-        chore.id === id ? { ...chore, completed: !currentStatus } : chore
+        chore.id === id ? { 
+          ...chore, 
+          completed: !currentStatus
+        } : chore
       ))
     } catch (err) {
       console.error('Error updating chore:', err)
@@ -90,10 +142,10 @@ const Chores = () => {
     }
   }
 
-  // Delete a chore
+  
   const deleteChore = async (id) => {
     try {
-      await deleteDoc(doc(database, 'userChores', id))
+      await deleteDoc(doc(database, 'sharedChores', id))
       setChores(chores.filter(chore => chore.id !== id))
     } catch (err) {
       console.error('Error deleting chore:', err)
@@ -101,7 +153,7 @@ const Chores = () => {
     }
   }
 
-  // Format date for display
+  
   const formatDate = (dateString) => {
     if (!dateString) return 'No due date'
     
@@ -112,17 +164,23 @@ const Chores = () => {
     })
   }
 
+  
+  const getChoreCount = (userId) => {
+    if (!userId) return '0 chores'
+    
+    const assignedChores = chores.filter(chore => chore.assigneeId === userId).length
+    return `${assignedChores} chore${assignedChores !== 1 ? 's' : ''}`
+  }
+
   return (
     <>
       <PageContainer>
         <Navbar />
         <FormContainer>
           <FormCard>
-            <FormHeader>Chores <span>Manager</span></FormHeader>
-            <FormSubtitle>Organize and track your household chores</FormSubtitle>
-            
+            <FormHeader>Shared <span>Chores</span></FormHeader>
+            <FormSubtitle>Manage household chores with your roommates</FormSubtitle>
             {error && <ErrorMessage>{error}</ErrorMessage>}
-            
             <AddChoreSection>
               <InputGroup>
                 <Input
@@ -131,12 +189,17 @@ const Chores = () => {
                   onChange={(e) => setNewChore(e.target.value)}
                   placeholder="Enter chore description"
                 />
-                <Input
-                  type="text"
+                <SelectInput
                   value={newAssignee}
                   onChange={(e) => setNewAssignee(e.target.value)}
-                  placeholder="Assigned to"
-                />
+                >
+                  <option value="">Assign to me</option>
+                  {roommateProfiles.map(roommate => (
+                    <option key={roommate.id} value={roommate.id}>
+                      {roommate.firstName} {roommate.lastName}
+                    </option>
+                  ))}
+                </SelectInput>
                 <DateInput
                   type="date"
                   value={newDueDate}
@@ -149,8 +212,10 @@ const Chores = () => {
             <ChoresContainer>
               {chores.length === 0 ? (
                 <EmptyState>
-                  <EmptyStateText>No chores added yet</EmptyStateText>
-                  <EmptyStateSubtext>Add your first chore using the form above</EmptyStateSubtext>
+                  <EmptyStateText>No chores found</EmptyStateText>
+                  <EmptyStateSubtext>
+                    Add your first chore using the form above
+                  </EmptyStateSubtext>
                 </EmptyState>
               ) : (
                 <ChoresList>
@@ -165,22 +230,52 @@ const Chores = () => {
                           {chore.description}
                         </ChoreDescription>
                         <ChoreMetadata>
-                          {chore.assignee && <ChoreAssignee>Assigned to: {chore.assignee}</ChoreAssignee>}
+                          <ChoreAssignee>
+                            Assigned to: {user && chore.assigneeId === user.uid ? 'Me' : chore.assigneeName}
+                          </ChoreAssignee>
                           {chore.dueDate && 
-                            <ChoreDueDate overdue={new Date(chore.dueDate) < new Date() && !chore.completed}>
+                            <ChoreDueDate>
                               Due: {formatDate(chore.dueDate)}
                             </ChoreDueDate>
                           }
                         </ChoreMetadata>
                       </ChoreDetails>
                       <DeleteButton onClick={() => deleteChore(chore.id)}>
-                        ✕
+                        X
                       </DeleteButton>
                     </ChoreItem>
                   ))}
                 </ChoresList>
               )}
             </ChoresContainer>
+
+            <RoommateStatusSection>
+              <SectionTitle>Household Members</SectionTitle>
+              <RoommatesList>
+                {roommateProfiles.length > 0 ? (
+                  roommateProfiles.map(roommate => (
+                    <RoommateItem key={roommate.id}>
+                      <RoommateAvatar>
+                        {roommate.firstName?.[0]}{roommate.lastName?.[0]}
+                      </RoommateAvatar>
+                      <RoommateName>{roommate.firstName} {roommate.lastName}</RoommateName>
+                      <RoommateChoreCount>{getChoreCount(roommate.id)}</RoommateChoreCount>
+                    </RoommateItem>
+                  ))
+                ) : (
+                  <EmptyRoommateMessage>
+                    No roommates yet. Match with others in the Roommate finder!
+                  </EmptyRoommateMessage>
+                )}
+                <RoommateItem>
+                  <RoommateAvatar>
+                    ME
+                  </RoommateAvatar>
+                  <RoommateName>Me</RoommateName>
+                  <RoommateChoreCount>{getChoreCount(user?.uid)}</RoommateChoreCount>
+                </RoommateItem>
+              </RoommatesList>
+            </RoommateStatusSection>
           </FormCard>
         </FormContainer>
       </PageContainer>
@@ -248,7 +343,8 @@ const AddChoreSection = styled.div`
 const InputGroup = styled.div`
   display: grid;
   grid-template-columns: 3fr 2fr 1fr 1fr;
-  gap: 12px;
+  gap: 15px;
+  
   
 `;
 
@@ -256,18 +352,33 @@ const Input = styled.input`
   font-size: 16px;
   padding: 12px 16px;
   border-radius: 8px;
-  border: .37px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   background-color: rgba(255, 255, 255, 0.05);
   color: white;
   
   &:focus {
-    transition: 0.2s;
     border-color: #ff6b6b;
-    box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.3);
   }
   
   &::placeholder {
     color: rgba(255, 255, 255, 0.3);
+  }
+`;
+
+const SelectInput = styled.select`
+  font-size: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
+  
+  &:focus {
+    border-color: #ff6b6b;
+  }
+  
+  option {
+    background-color: #1a1a1a;
   }
 `;
 
@@ -282,16 +393,15 @@ const AddButton = styled.button`
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  transition: all 0.3s ease;
+  
   &:hover {
     color: white;
-    font-weight: bold;
-    transform: translateY(-2px);
   }
 `;
 
 const ChoresContainer = styled.div`
   min-height: 300px;
+  margin-bottom: 30px;
 `;
 
 const ChoresList = styled.ul`
@@ -305,13 +415,8 @@ const ChoreItem = styled.li`
   align-items: center;
   padding: 16px;
   border-radius: 8px;
-  background-color: ${props => props.completed ? 'rgba(0, 255, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)'};
+  background-color: rgba(255, 255, 255, 0.05);
   margin-bottom: 12px;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background-color: ${props => props.completed ? 'rgba(0, 255, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'};
-  }
 `;
 
 const ChoreCheckbox = styled.input.attrs({ type: 'checkbox' })`
@@ -319,7 +424,6 @@ const ChoreCheckbox = styled.input.attrs({ type: 'checkbox' })`
   height: 20px;
   margin-right: 16px;
   cursor: pointer;
-  accent-color: #ff6b6b;
 `;
 
 const ChoreDetails = styled.div`
@@ -331,7 +435,6 @@ const ChoreDescription = styled.p`
   color: white;
   margin: 0 0 8px 0;
   text-decoration: ${props => props.completed ? 'line-through' : 'none'};
-
 `;
 
 const ChoreMetadata = styled.div`
@@ -347,8 +450,7 @@ const ChoreAssignee = styled.span`
 
 const ChoreDueDate = styled.span`
   font-size: 14px;
-  color:rgba(255, 255, 255, 0.7);
-  font-weight: bold;
+  color: rgba(255, 255, 255, 0.7);
 `;
 
 const DeleteButton = styled.button`
@@ -362,14 +464,12 @@ const DeleteButton = styled.button`
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  
   &:hover {
     background-color: rgba(255, 107, 107, 0.3);
     color: white;
   }
 `;
-
-
 
 const EmptyState = styled.div`
   display: flex;
@@ -388,6 +488,67 @@ const EmptyStateText = styled.p`
 const EmptyStateSubtext = styled.p`
   font-size: 16px;
   color: rgba(255, 255, 255, 0.5);
+`;
+
+const RoommateStatusSection = styled.div`
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const SectionTitle = styled.h3`
+  font-size: 20px;
+  color: white;
+  margin-bottom: 16px;
+`;
+
+const RoommatesList = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+`;
+
+const RoommateItem = styled.div`
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const RoommateAvatar = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: rgba(255, 107, 107, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 8px;
+`;
+
+const RoommateName = styled.p`
+  font-size: 16px;
+  color: white;
+  margin: 0 0 8px 0;
+  text-align: center;
+`;
+
+const RoommateChoreCount = styled.p`
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  margin: 0;
+`;
+
+const EmptyRoommateMessage = styled.div`
+  
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 20px;
 `;
 
 export default Chores;
