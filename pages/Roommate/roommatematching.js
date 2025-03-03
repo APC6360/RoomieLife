@@ -113,9 +113,7 @@ const SimpleRoommateMatching = () => {
   
   const handleLike = async () => {
     if (!currentMatch) return
-    
     const likedUserId = currentMatch.id
-    
     try {
       const userMatchesRef = doc(database, 'roomateMatches', user.uid)
       const userMatchesSnapshot = await getDoc(userMatchesRef)
@@ -308,26 +306,6 @@ const ProfileFetchRenderer = ({ matchId, render }) => {
     }
   }
   
-  const getMatchProfile = (matchId) => {
-    const matchFromPotential = potentialMatches.find(match => match.id === matchId)
-    if (matchFromPotential) return matchFromPotential
-    
-    const matchesQuery = query(
-      collection(database, 'userProfiles'),
-      where('__name__', '==', matchId)
-    )
-    
-    return getDocs(matchesQuery).then(querySnapshot => {
-      if (!querySnapshot.empty) {
-        const doc = querySnapshot.docs[0]
-        return {
-          id: doc.id,
-          ...doc.data()
-        }
-      }
-      return null
-    })
-  }
   
   if (!user) {
     return null
@@ -502,8 +480,8 @@ const PageContainer = styled.div`
 `;
 
 const ContentContainer = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 1500px;
+  margin:auto;
   padding: 30px 20px;
 `;
 
@@ -517,21 +495,18 @@ const PageTitle = styled.h1`
 const MainContent = styled.div`
   display: flex;
   gap: 20px;
+  flex-direction: column;
   
-  @media (max-width: 900px) {
-    flex-direction: column;
-  }
+ 
 `;
 
 const SidebarSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
-  width: 350px;
+  width: 100%;
   
-  @media (max-width: 900px) {
-    width: 100%;
-  }
+
 `;
 
 const SectionTitle = styled.h2`
@@ -673,16 +648,16 @@ const DislikeButton = styled(Button)`
 `;
 
 const RoommateButton = styled(Button)`
-  background-color: ${props => props.isPending ? '#FFA07A' : '#ff6b6b'};
+  background-color: #ff6b6b;
   color: black;
   padding: 8px 12px;
   font-size: 14px;
-  opacity: ${props => props.isPending ? 0.7 : 1};
-  cursor: ${props => props.isPending ? 'default' : 'pointer'};
+  opacity: 1;
+  cursor: pointer;
   
   &:hover {
-    color: ${props => props.isPending ? 'black' : 'white'};
-    background-color: ${props => props.isPending ? '#FFA07A' : '#ff4d4d'};
+    color: white;
+    background-color:#ff4d4d;
   }
 `;
 
