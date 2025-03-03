@@ -15,12 +15,14 @@ const SimpleRoommateMatching = () => {
   const [currentMatch, setCurrentMatch] = useState(null)
   const [error, setError] = useState('')
   const [matchList, setMatchList] = useState([])
+  const [roommateList, setRoommateList] = useState([])
+
   useEffect(() => {
     if (!user) {
       router.push('/auth/login')
       return
     }
-    const fetchUserProfile = async () => { //fetches the user profile
+    const fetchUserProfile = async () => {
       try {
         const profileRef = doc(database, 'userProfiles', user.uid)
         const profileSnapshot = await getDoc(profileRef)
@@ -35,11 +37,10 @@ const SimpleRoommateMatching = () => {
       } catch (err) {
         console.error('Error fetching profile:', err)
         setError('Failed to load profile data. Please try again.')
-       
       }
     }
 
-    const fetchPotentialMatches = async (profileData) => { //fetches the potential matches
+    const fetchPotentialMatches = async (profileData) => {
       try {
         const matchesQuery = query(
           collection(database, 'userProfiles'),
@@ -60,14 +61,14 @@ const SimpleRoommateMatching = () => {
         if (matches.length > 0) {
           setCurrentMatch(matches[0])
         }
-        await fetchExistingMatches()
+        await fetchExistingMatchesAndRoommates()
       } catch (err) {
         console.error('Error fetching matches:', err)
         setError('Failed to load potential roommates. Please try again.')
       }
     }
     
-    const fetchExistingMatches = async () => { //fetches the existing matches
+    const fetchExistingMatchesAndRoommates = async () => {
       try {
         const matchesRef = doc(database, 'roomateMatches', user.uid)
         const matchesSnapshot = await getDoc(matchesRef)
@@ -75,16 +76,17 @@ const SimpleRoommateMatching = () => {
         if (matchesSnapshot.exists()) {
           const matchData = matchesSnapshot.data()
           setMatchList(matchData.matches || [])
+          setRoommateList(matchData.roommates || [])
         }
       } catch (err) {
-        console.error('Error fetching existing matches:', err)
+        console.error('Error fetching existing matches and roommates:', err)
       }
     }
 
     fetchUserProfile()
   }, [user, router])
   
-  const handleLike = async () => { //handles the like button
+  const handleLike = async () => {
     if (!currentMatch) return
     
     const likedUserId = currentMatch.id
@@ -93,26 +95,26 @@ const SimpleRoommateMatching = () => {
       const userMatchesRef = doc(database, 'roomateMatches', user.uid)
       const userMatchesSnapshot = await getDoc(userMatchesRef)
       
-      if (userMatchesSnapshot.exists()) { //if the user exists
+      if (userMatchesSnapshot.exists()) {
         await updateDoc(userMatchesRef, {
-          likes: arrayUnion(likedUserId) //add the liked user to the likes array
+          likes: arrayUnion(likedUserId)
         })
       } else {
-        await setDoc(userMatchesRef, { //create a new document
-          likes: [likedUserId], //add the liked user to the likes array
+        await setDoc(userMatchesRef, {
+          likes: [likedUserId],
           dislikes: [],
-          matches: []
+          matches: [],
+          roommates: []
         })
       }
       
-      const otherUserMatchesRef = doc(database, 'roomateMatches', likedUserId) //get the other user's matches
-      const otherUserMatchesSnapshot = await getDoc(otherUserMatchesRef) //get the other user's matches
+      const otherUserMatchesRef = doc(database, 'roomateMatches', likedUserId)
+      const otherUserMatchesSnapshot = await getDoc(otherUserMatchesRef)
       
       if (otherUserMatchesSnapshot.exists()) {
         const otherUserData = otherUserMatchesSnapshot.data()
         
-        if (otherUserData.likes && otherUserData.likes.includes(user.uid)) { //if users like each other
-          //match
+        if (otherUserData.likes && otherUserData.likes.includes(user.uid)) {
           await updateDoc(userMatchesRef, {
             matches: arrayUnion(likedUserId)
           })
@@ -121,13 +123,11 @@ const SimpleRoommateMatching = () => {
             matches: arrayUnion(user.uid)
           })
           
-          // add match to list
           setMatchList(prevMatches => [...prevMatches, likedUserId])
           alert("You have a new match!")
         }
       }
       
-      // move to next match
       moveToNextMatch()
     } catch (err) {
       console.error('Error updating matches:', err)
@@ -137,40 +137,47 @@ const SimpleRoommateMatching = () => {
   
   const handleMakeRoommate = async (matchId) => {
     try {
-      // Update current user's data
+      //update current user
       const userMatchesRef = doc(database, 'roomateMatches', user.uid);
       const userMatchesSnapshot = await getDoc(userMatchesRef);
   
       if (userMatchesSnapshot.exists()) {
+        //remove matche from matches and add to roommates
         await updateDoc(userMatchesRef, {
+          matches: arrayRemove(matchId),
           roommates: arrayUnion(matchId)
         });
       } else {
         await setDoc(userMatchesRef, {
           likes: [],
           dislikes: [],
-          matches: [matchId],
+          matches: [],
           roommates: [matchId]
         });
       }
   
-      // Update the matched user's data
+      //update matched user
       const matchedUserRef = doc(database, 'roomateMatches', matchId);
       const matchedUserSnapshot = await getDoc(matchedUserRef);
   
       if (matchedUserSnapshot.exists()) {
         await updateDoc(matchedUserRef, {
+          matches: arrayRemove(user.uid),
           roommates: arrayUnion(user.uid)
         });
       } else {
         await setDoc(matchedUserRef, {
           likes: [],
           dislikes: [],
-          matches: [user.uid],
+          matches: [],
           roommates: [user.uid]
         });
       }
   
+      //update local state
+      setMatchList(prevMatches => prevMatches.filter(id => id !== matchId));
+      setRoommateList(prevRoommates => [...prevRoommates, matchId]);
+      
       alert("You are now roommates!");
     } catch (err) {
       console.error('Error updating roommate:', err);
@@ -184,25 +191,22 @@ const SimpleRoommateMatching = () => {
     const dislikedUserId = currentMatch.id
     
     try {
-      
       const userMatchesRef = doc(database, 'roomateMatches', user.uid)
       const userMatchesSnapshot = await getDoc(userMatchesRef)
       
       if (userMatchesSnapshot.exists()) {
-        
         await updateDoc(userMatchesRef, {
           dislikes: arrayUnion(dislikedUserId)
         })
       } else {
-        // create new document
         await setDoc(userMatchesRef, {
           likes: [],
           dislikes: [dislikedUserId],
-          matches: []
+          matches: [],
+          roommates: []
         })
       }
       
-      // move to next match
       moveToNextMatch()
     } catch (err) {
       console.error('Error updating dislikes:', err)
@@ -211,14 +215,11 @@ const SimpleRoommateMatching = () => {
   }
 
   const moveToNextMatch = () => {
-    // current match index
     const currentIndex = potentialMatches.findIndex(match => match.id === currentMatch.id)
     
-    // move to next match
     if (currentIndex < potentialMatches.length - 1) {
       setCurrentMatch(potentialMatches[currentIndex + 1])
     } else {
-      // No more matches
       setCurrentMatch(null)
     }
   }
@@ -227,7 +228,6 @@ const SimpleRoommateMatching = () => {
     return potentialMatches.find(match => match.id === matchId)
   }
   
-  // If user is not authenticated, don't render the page
   if (!user) {
     return null
   }
@@ -237,72 +237,106 @@ const SimpleRoommateMatching = () => {
       <Navbar />
       <ContentContainer>
         <PageTitle>Find Your Roommate at {userProfile?.university}</PageTitle>
-         (
-          <MainContent>
-            <MatchingSection>
-              <SectionTitle>Potential Roommates</SectionTitle>
-              {currentMatch ? ( 
-                <PotentialMatchCard> 
-                  <ProfileSection> 
-                    {currentMatch.profilePicture ? (
-                      <ProfileImage 
-                        src={currentMatch.profilePicture} 
-                        alt={`${currentMatch.firstName}'s profile`} 
-                        width={120} 
-                        height={120} 
-                      />
-                    ) : ( 
-                      <ProfilePlaceholder>
-                        {currentMatch.firstName?.[0]}{currentMatch.lastName?.[0]}
-                      </ProfilePlaceholder>
-                    )}
-                    <ProfileName>{currentMatch.firstName} {currentMatch.lastName}</ProfileName>
-                    <ProfileDetail>Age: {currentMatch.age}</ProfileDetail>
-                  </ProfileSection>
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+        <MainContent>
+          <MatchingSection>
+            <SectionTitle>Potential Roommates</SectionTitle>
+            {currentMatch ? ( 
+              <PotentialMatchCard> 
+                <ProfileSection> 
+                  {currentMatch.profilePicture ? (
+                    <ProfileImage 
+                      src={currentMatch.profilePicture} 
+                      alt={`${currentMatch.firstName}'s profile`} 
+                      width={120} 
+                      height={120} 
+                    />
+                  ) : ( 
+                    <ProfilePlaceholder>
+                      {currentMatch.firstName?.[0]}{currentMatch.lastName?.[0]}
+                    </ProfilePlaceholder>
+                  )}
+                  <ProfileName>{currentMatch.firstName} {currentMatch.lastName}</ProfileName>
+                  <ProfileDetail>Age: {currentMatch.age}</ProfileDetail>
+                </ProfileSection>
+                
+                <DetailSection>
+                  <DetailItem>
+                    <DetailLabel>University:</DetailLabel>
+                    <DetailValue>{currentMatch.university}</DetailValue>
+                  </DetailItem>
+                  <DetailItem>
+                    <DetailLabel>Bio:</DetailLabel>
+                    <DetailValue>{currentMatch.bio || "No bio provided"}</DetailValue>
+                  </DetailItem>
                   
-                  <DetailSection>
-                    <DetailItem>
-                      <DetailLabel>University:</DetailLabel>
-                      <DetailValue>{currentMatch.university}</DetailValue>
-                    </DetailItem>
-                    <DetailItem>
-                      <DetailLabel>Bio:</DetailLabel>
-                      <DetailValue>{currentMatch.bio || "No bio provided"}</DetailValue>
-                    </DetailItem>
-                    
-                    {currentMatch.lifestylePreferences && (
-                      <>
-                        <DetailItem>
-                          <DetailLabel>Smoking:</DetailLabel>
-                          <DetailValue>{currentMatch.lifestylePreferences.smoking || "Not specified"}</DetailValue>
-                        </DetailItem>
-                        <DetailItem>
-                          <DetailLabel>Pets:</DetailLabel>
-                          <DetailValue>{currentMatch.lifestylePreferences.pets || "Not specified"}</DetailValue>
-                        </DetailItem>
-                        <DetailItem>
-                          <DetailLabel>Noise Level:</DetailLabel>
-                          <DetailValue>{currentMatch.lifestylePreferences.noise || "Not specified"}</DetailValue>
-                        </DetailItem>
-                        <DetailItem>
-                          <DetailLabel>Cleanliness:</DetailLabel>
-                          <DetailValue>{currentMatch.lifestylePreferences.cleanliness || "Not specified"}</DetailValue>
-                        </DetailItem>
-                      </>
-                    )}
-                  </DetailSection>
-                  <ButtonContainer>
-                    <DislikeButton onClick={handleDislike}>Not Interested</DislikeButton>
-                    <LikeButton onClick={handleLike}>Interested</LikeButton>
-                  </ButtonContainer>
-                </PotentialMatchCard>
-              ) : (
-                <NoMoreMatches>
-                  No more potential roommates available. Check back later!
-                </NoMoreMatches>
-              )}
-            </MatchingSection>
+                  {currentMatch.lifestylePreferences && (
+                    <>
+                      <DetailItem>
+                        <DetailLabel>Smoking:</DetailLabel>
+                        <DetailValue>{currentMatch.lifestylePreferences.smoking || "Not specified"}</DetailValue>
+                      </DetailItem>
+                      <DetailItem>
+                        <DetailLabel>Pets:</DetailLabel>
+                        <DetailValue>{currentMatch.lifestylePreferences.pets || "Not specified"}</DetailValue>
+                      </DetailItem>
+                      <DetailItem>
+                        <DetailLabel>Noise Level:</DetailLabel>
+                        <DetailValue>{currentMatch.lifestylePreferences.noise || "Not specified"}</DetailValue>
+                      </DetailItem>
+                      <DetailItem>
+                        <DetailLabel>Cleanliness:</DetailLabel>
+                        <DetailValue>{currentMatch.lifestylePreferences.cleanliness || "Not specified"}</DetailValue>
+                      </DetailItem>
+                    </>
+                  )}
+                </DetailSection>
+                <ButtonContainer>
+                  <DislikeButton onClick={handleDislike}>Not Interested</DislikeButton>
+                  <LikeButton onClick={handleLike}>Interested</LikeButton>
+                </ButtonContainer>
+              </PotentialMatchCard>
+            ) : (
+              <NoMoreMatches>
+                No more potential roommates available. Check back later!
+              </NoMoreMatches>
+            )}
+          </MatchingSection>
 
+          <SidebarSection>
+            <RoommatesSection>
+              <SectionTitle>My Roommates ({roommateList.length})</SectionTitle>
+              {roommateList.length > 0 ? (
+                <RoommatesList>
+                  {roommateList.map(roommateId => {
+                    const roommate = getMatchProfile(roommateId)
+                    if (!roommate) return null
+      
+                    return (
+                      <RoommateListItem key={roommateId}>
+                        {roommate.profilePicture ? (
+                          <SmallProfileImage 
+                            src={roommate.profilePicture} 
+                            alt={`${roommate.firstName}'s profile`} 
+                            width={50} 
+                            height={50} 
+                          />
+                        ) : (
+                          <SmallProfilePlaceholder>
+                            {roommate.firstName?.[0]}{roommate.lastName?.[0]}
+                          </SmallProfilePlaceholder>
+                        )}
+                        <MatchName>{roommate.firstName} {roommate.lastName}</MatchName>
+                      </RoommateListItem>
+                    )
+                  })}
+                </RoommatesList>
+              ) : (
+                <NoRoommates>
+                  You haven't confirmed any roommates yet. Make someone a roommate from your matches!
+                </NoRoommates>
+              )}
+            </RoommatesSection>
             <MatchesSection>
               <SectionTitle>My Matches ({matchList.length})</SectionTitle>
               {matchList.length > 0 ? (
@@ -339,14 +373,13 @@ const SimpleRoommateMatching = () => {
                 </NoMatches>
               )}
             </MatchesSection>
-          </MainContent>
-        )
+          </SidebarSection>
+        </MainContent>
       </ContentContainer>
     </PageContainer>
   )
 }
 
-// Styled Components
 const PageContainer = styled.div`
   background-color: #121212;
   font-family: 'Gill Sans MT';
@@ -375,6 +408,17 @@ const MainContent = styled.div`
   }
 `;
 
+const SidebarSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 350px;
+  
+  @media (max-width: 900px) {
+    width: 100%;
+  }
+`;
+
 const SectionTitle = styled.h2`
   font-size: 22px;
   color: #ff6b6b;
@@ -390,16 +434,12 @@ const MatchingSection = styled.div`
   border-radius: 10px;
 `;
 
+
 const MatchesSection = styled.div`
-  width: 350px;
   background-color: rgb(32, 31, 31);
   padding: 20px;
   border-radius: 10px;
   height: fit-content;
-  
-  @media (max-width: 900px) {
-    width: 100%;
-  }
 `;
 
 const PotentialMatchCard = styled.div`
@@ -524,6 +564,7 @@ const MatchesList = styled.div`
   gap: 10px;
 `;
 
+
 const MatchListItem = styled.div`
   display: flex;
   align-items: center;
@@ -531,6 +572,7 @@ const MatchListItem = styled.div`
   padding: 10px;
   border-radius: 8px;
 `;
+
 
 const MatchName = styled.p`
   flex: 1;
@@ -562,6 +604,15 @@ const NoMatches = styled.p`
   border-radius: 8px;
 `;
 
+const NoRoommates = styled.p`
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  padding: 20px 10px;
+  font-size: 16px;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+`;
+
 const NoMoreMatches = styled.div`
   color: rgba(255, 255, 255, 0.7);
   text-align: center;
@@ -571,18 +622,25 @@ const NoMoreMatches = styled.div`
   border-radius: 8px;
 `;
 
-
-
-const ErrorMessage = styled.div`
-  color: #ff6b6b;
-  background-color: rgba(255, 107, 107, 0.1);
+const RoommateListItem = styled.div`
+  display: flex;
+  align-items: center;
+  background-color: #1a1a1a;
+  padding: 10px;
   border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 24px;
-  font-size: 16px;
-  text-align: center;
-  max-width: 600px;
-  margin: 0 auto;
+`;
+
+const RoommatesList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
+
+const RoommatesSection = styled.div`
+  background-color: rgb(32, 31, 31);
+  padding: 20px;
+  border-radius: 10px;
+  height: fit-content;
 `;
 
 export default SimpleRoommateMatching
