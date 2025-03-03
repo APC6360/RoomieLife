@@ -115,7 +115,7 @@ const SimpleRoommateMatching = () => {
       if (otherUserMatchesSnapshot.exists()) {
         const otherUserData = otherUserMatchesSnapshot.data()
         
-        if (otherUserData.likes && otherUserData.likes.includes(user.uid)) {
+        if (otherUserData.likes && otherUserData.likes.includes(user.uid)) { //if users like each other
           //match
           await updateDoc(userMatchesRef, {
             matches: arrayUnion(likedUserId)
@@ -139,6 +139,31 @@ const SimpleRoommateMatching = () => {
     }
   }
   
+  const handleMakeRoommate = async (matchId) => { //handles the make roommate button
+    try {
+      const userMatchesRef = doc(database, 'roomateMatches', user.uid)
+      const userMatchesSnapshot = await getDoc(userMatchesRef)
+
+      if (userMatchesSnapshot.exists()) {
+        await updateDoc(userMatchesRef, {
+          matches: arrayUnion(matchId),
+          roommates: arrayUnion(matchId)
+        })
+      } else {
+        await setDoc(userMatchesRef, {
+          likes: [],
+          dislikes: [],
+          matches: [matchId],
+          roommates: [matchId]
+        })
+      }
+    }
+    catch (err) {
+      console.error('Error updating roommate:', err)
+      setError('Failed to save your choice. Please try again.')
+    }
+
+  }
   const handleDislike = async () => {
     if (!currentMatch) return
     
@@ -291,7 +316,7 @@ const SimpleRoommateMatching = () => {
                           </SmallProfilePlaceholder>
                         )}
                         <MatchName>{match.firstName} {match.lastName}</MatchName>
-                        <TempButton onClick={() => router.push(`/temp/${matchId}`)}>
+                        <TempButton onClick={handleMakeRoommate(matchId)}>
                           temp
                         </TempButton>
                       </MatchListItem>
