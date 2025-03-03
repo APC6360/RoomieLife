@@ -342,7 +342,7 @@ const AddChoreSection = styled.div`
 
 const InputGroup = styled.div`
   display: grid;
-  grid-template-columns: 3fr 2fr 1fr 1fr;
+  
   gap: 15px;
   
   

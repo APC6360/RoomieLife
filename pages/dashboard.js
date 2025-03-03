@@ -107,7 +107,7 @@ export default function Dashboard() {
               <CardIcon>💰</CardIcon>
               <CardTitle>Expenses</CardTitle>
               <CardDescription>Track shared expenses and payments</CardDescription>
-              <CardButton href="/Roommate/expense.js">Manage Expenses</CardButton>
+              <CardButton href="/Roommate/expense">Manage Expenses</CardButton>
             </DashboardCard>
           </DashboardCards>
 
