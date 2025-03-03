@@ -297,10 +297,11 @@ const RoommateSection = styled.div`
   background-color: rgba(255, 255, 255, 0.1);
   padding: 30px;
   border-radius: 16px;
+  margin-top: 15px;
 `;
 
 const RoommateSectionHeader = styled.div`
-  margin-bottom: 30px;
+  margin-bottom: 5px;
 `;
 
 const RoommateTitle = styled.h2`
@@ -316,13 +317,13 @@ const RoommateSubtitle = styled.p`
 
 const RoommateCards = styled.div`
   display: grid;
-  gap: 20px;
+  gap: 10px;
   grid-template-columns: 1fr;
 `;
 
 const RoommateCard = styled.div`
   background-color: rgb(32, 31, 31);
-  padding: 25px;
+  padding: 10px;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -338,10 +339,9 @@ const RoommateCard = styled.div`
 const RoommateAvatar = styled.div`
   width: 80px;
   height: 80px;
-  font-size: 28px;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   background-color: rgba(255, 107, 107, 0.2);
-  border-radius: 50%;
+  border-radius: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -363,7 +363,7 @@ const RoommateName = styled.h3`
 `;
 
 const RoommateDetails = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 5px;
 `;
 
 const RoommateDetail = styled.p`
