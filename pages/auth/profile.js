@@ -274,10 +274,6 @@ const InfoRow = styled.div`
   width: ${props => props.fullWidth ? '100%' : '50%'};
   margin-bottom: 24px;
   padding: 0 12px;
-
-  @media (max-width: 600px) {
-    width: 100%;
-  }
 `;
 
 const InfoLabel = styled.p`
@@ -302,7 +298,6 @@ const BiographyText = styled.p`
   min-height: 100px;
 `;
 
-// New Lifestyle Preferences Styles
 const LifestyleSection = styled.div`
   width: 100%;
   margin-bottom: 32px;
@@ -319,13 +314,9 @@ const SectionTitle = styled.h3`
 
 const PreferencesGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  
   gap: 20px;
   width: 100%;
-  
-  @media (max-width: 580px) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 const PreferenceCard = styled.div`
@@ -336,7 +327,6 @@ const PreferenceCard = styled.div`
   flex-direction: column;
   align-items: center;
   transition: all 0.3s ease;
-  
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(255, 107, 107, 0.1);
@@ -347,14 +337,12 @@ const PreferenceIcon = styled.div`
   font-size: 28px;
   margin-bottom: 12px;
 `;
-
 const PreferenceTitle = styled.h4`
   font-size: 16px;
   color: #ff6b6b;
   margin-bottom: 8px;
   text-align: center;
 `;
-
 const PreferenceValue = styled.p`
   font-size: 14px;
   color: white;
@@ -385,10 +373,6 @@ const ButtonsContainer = styled.div`
   justify-content: center;
   gap: 16px;
   width: 100%;
-
-  @media (max-width: 480px) {
-    flex-direction: column;
-  }
 `;
 
 const EditButton = styled.button`

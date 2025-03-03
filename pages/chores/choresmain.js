@@ -254,9 +254,6 @@ const InputGroup = styled.div`
   grid-template-columns: 3fr 2fr 1fr 1fr;
   gap: 12px;
   
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 const Input = styled.input`
@@ -269,7 +266,6 @@ const Input = styled.input`
   
   &:focus {
     transition: 0.2s;
-    outline: none;
     border-color: #ff6b6b;
     box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.3);
   }
@@ -291,7 +287,6 @@ const AddButton = styled.button`
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
-  
   &:hover {
     color: white;
     font-weight: bold;
@@ -340,7 +335,7 @@ const ChoreDescription = styled.p`
   color: white;
   margin: 0 0 8px 0;
   text-decoration: ${props => props.completed ? 'line-through' : 'none'};
-  opacity: ${props => props.completed ? 0.7 : 1};
+
 `;
 
 const ChoreMetadata = styled.div`
@@ -356,23 +351,22 @@ const ChoreAssignee = styled.span`
 
 const ChoreDueDate = styled.span`
   font-size: 14px;
-  color: ${props => props.overdue ? '#ff6b6b' : 'rgba(255, 255, 255, 0.7)'};
-  font-weight: ${props => props.overdue ? 'bold' : 'normal'};
+  color:rgba(255, 255, 255, 0.7);
+  font-weight: bold;
 `;
 
 const DeleteButton = styled.button`
   background-color: transparent;
   color: rgba(255, 255, 255, 0.7);
   border: none;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 90%;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-left: 16px;
   
   &:hover {
     background-color: rgba(255, 107, 107, 0.3);

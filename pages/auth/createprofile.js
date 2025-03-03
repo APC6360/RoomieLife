@@ -90,7 +90,7 @@ const CreateProfile = () => {
   }, [])
 
   const fetchUniversities = async (query) => {
-    if (!query || query.length < 2) return
+    if (!query || query.length < 2) return 
     
     setIsLoadingUniversities(true)
     try {
@@ -226,7 +226,6 @@ const CreateProfile = () => {
   if (!user) {
     return null
   }
- 
   return (
     <PageContainer>
       <Navbar />
@@ -234,7 +233,7 @@ const CreateProfile = () => {
         <FormCard>
           <FormHeader>Customize Your <span>Profile</span></FormHeader>
           <FormSubtitle>Tell us a bit about yourself</FormSubtitle>
-          {error && <ErrorMessage>{error}</ErrorMessage>}
+          {error && <ErrorMessage>{error}</ErrorMessage>} 
           
           <ProfilePictureSection>
             <ProfilePictureContainer onClick={handleSelectPicture}>
@@ -254,9 +253,7 @@ const CreateProfile = () => {
               onChange={handlePictureChange}
             />
           </ProfilePictureSection>
-
           <SectionTitle>Personal Information</SectionTitle>
-          
           <FormGroup>
             <InputTitle>First Name</InputTitle>
             <Input 
@@ -285,7 +282,6 @@ const CreateProfile = () => {
               onChange={(e) => setBirthday(e.target.value)}
             />
           </FormGroup>
-
           <FormGroup>
             <InputTitle>University</InputTitle>
             <AutocompleteContainer>
@@ -303,11 +299,9 @@ const CreateProfile = () => {
                   {isLoadingUniversities && (
                     <DropdownItem disabled>Loading universities...</DropdownItem>
                   )}
-                  
                   {!isLoadingUniversities && filteredUniversities.length === 0 && (
                     <DropdownItem disabled>No universities found</DropdownItem>
                   )}
-                  
                   {!isLoadingUniversities && filteredUniversities.map((uni, index) => (
                     <DropdownItem 
                       key={index} 
@@ -341,8 +335,8 @@ const CreateProfile = () => {
               onChange={(e) => setSmokingPreference(e.target.value)}
             >
               <option value="">Select your preference</option>
-              {smokingOptions.map((option, index) => (
-                <option key={index} value={option}>{option}</option>
+              {smokingOptions.map((option, index) => ( //map is used to iterate over the array
+                <option key={index} value={option}>{option}</option> //key is used to identify the element
               ))}
             </Select>
           </FormGroup>
@@ -354,12 +348,11 @@ const CreateProfile = () => {
               onChange={(e) => setPetsPreference(e.target.value)}
             >
               <option value="">Select your preference</option>
-              {petsOptions.map((option, index) => (
+              {petsOptions.map((option, index) => ( 
                 <option key={index} value={option}>{option}</option>
               ))}
             </Select>
           </FormGroup>
-
           <FormGroup>
             <InputTitle>Noise Level</InputTitle>
             <Select
@@ -372,7 +365,6 @@ const CreateProfile = () => {
               ))}
             </Select>
           </FormGroup>
-
           <FormGroup>
             <InputTitle>Cleanliness</InputTitle>
             <Select
@@ -490,7 +482,7 @@ const FormGroup = styled.div`
 const InputTitle = styled.label`
   font-size: 16px;
   color: white;
-  display: block;
+  display: flex;
   margin-bottom: 8px;
 `;
 
@@ -514,38 +506,28 @@ const Input = styled.input`
 `;
 
 const AutocompleteContainer = styled.div`
-  position: relative;
   width: 100%;
 `;
 
 const DropdownContainer = styled.div`
-  position: absolute;
   top: 100%;
-  left: 0;
-  right: 0;
-  max-height: 240px;
+  max-height: 200px;
   overflow-y: auto;
   background-color: #282828;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 10;
   margin-top: 4px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 `;
 
 const DropdownItem = styled.div`
   padding: 12px 16px;
-  cursor: ${props => props.disabled ? 'default' : 'pointer'};
-  color: ${props => props.disabled ? 'rgba(255, 255, 255, 0.5)' : 'white'};
-  background-color: ${props => props.active ? 'rgba(255, 107, 107, 0.2)' : 'transparent'};
-  
+  color: white;
+  cursor: pointer;
   &:hover {
     background-color: ${props => props.disabled ? 'transparent' : 'rgba(255, 107, 107, 0.1)'};
   }
   
-  &:not(:last-child) {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  }
 `;
 
 const TextArea = styled.textarea`
@@ -621,12 +603,6 @@ const SubmitButton = styled.button`
     transform: translateY(-4px);
   }
   
-  &:disabled {
-    background-color: #7d3535;
-    cursor: not-allowed;
-    transform: none;
-    color: rgba(255, 255, 255, 0.5);
-  }
 `;
 
 export default CreateProfile

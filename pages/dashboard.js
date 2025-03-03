@@ -2,7 +2,7 @@ import React from 'react'
 import { styled } from 'styled-components'
 import Navbar from "@/components/Dashboard/Navbar"
 import Link from 'next/link'
-import Image from 'next/image'
+
 
 export default function Dashboard() {
   
@@ -101,9 +101,6 @@ const DashboardCards = styled.div`
   grid-template-columns: 1fr;
   margin-bottom: 40px;
   
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
 `;
 
 const DashboardCard = styled.div`
@@ -149,8 +146,6 @@ const CardButton = styled(Link)`
   margin-top: auto;
   
   &:hover {
-    background-color: #ff6b6b;
-    color: black;
     font-weight: bold;
   }
 `;
@@ -172,9 +167,6 @@ const SummaryBox = styled.div`
   gap: 20px;
   grid-template-columns: 1fr;
   
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
 `;
 
 const SummaryItem = styled.div`

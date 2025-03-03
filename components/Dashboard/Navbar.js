@@ -4,11 +4,14 @@ import Link from 'next/link'
 import { logOut } from '@/backend/Auth';
 import { useStateContext } from '@/context/StateContext';
 import Home from '@/components/Dashboard/Home'
+import { useRouter } from 'next/router'
 const Navbar = () => {
   const { user, setUser } = useStateContext()
-
+  const router = useRouter()
   const handleLogout = async() => {
     await logOut(setUser);
+    router.push('/');
+    
     
   };
 
@@ -17,7 +20,12 @@ const Navbar = () => {
     <Nav>
       <LeftSide>
         <Home></Home>
-      <RoomieLife href="/">Roomie<span>Life</span></RoomieLife>
+        {user ? (
+          <RoomieLife href="/dashboard">Roomie<span>Life</span></RoomieLife>
+        ) : (
+          <RoomieLife href="/">Roomie<span>Life</span></RoomieLife>
+        )}
+      
       </LeftSide>
       <NavLinks>
         {user ? (
@@ -26,14 +34,12 @@ const Navbar = () => {
           <ButtonLink href="/dashboard">Dashboard</ButtonLink>
           <ButtonLink href="/Roommate/roommatematching">Roommate Matching</ButtonLink>
           <ButtonLink href='/chores/choresmain'>Chores</ButtonLink>
-          <ButtonLink href="/about">About</ButtonLink>
           <ButtonLinkasButton onClick={handleLogout}>Logout</ButtonLinkasButton>
           </>
         ) : (
           <>
           <ButtonLink href="/auth/signup">Sign Up</ButtonLink>
           <ButtonLink href="/auth/login">Login</ButtonLink>
-          <ButtonLink href="/about">About</ButtonLink>
           </>
         )}
         

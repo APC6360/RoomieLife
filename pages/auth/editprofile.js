@@ -535,38 +535,29 @@ const Input = styled.input`
 `;
 
 const AutocompleteContainer = styled.div`
-  position: relative;
   width: 100%;
 `;
 
 const DropdownContainer = styled.div`
-  position: absolute;
   top: 100%;
-  left: 0;
-  right: 0;
-  max-height: 240px;
+  max-height: 200px;
   overflow-y: auto;
   background-color: #282828;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 10;
   margin-top: 4px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 `;
 
 const DropdownItem = styled.div`
   padding: 12px 16px;
-  cursor: ${props => props.disabled ? 'default' : 'pointer'};
-  color: ${props => props.disabled ? 'rgba(255, 255, 255, 0.5)' : 'white'};
-  background-color: ${props => props.active ? 'rgba(255, 107, 107, 0.2)' : 'transparent'};
+  color: white;
+  cursor: pointer;
   
   &:hover {
     background-color: ${props => props.disabled ? 'transparent' : 'rgba(255, 107, 107, 0.1)'};
   }
-  
-  &:not(:last-child) {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  }
+
 `;
 
 const TextArea = styled.textarea`
@@ -598,9 +589,6 @@ const Select = styled.select`
   border: .37px solid rgba(255, 255, 255, 0.1);
   background-color: rgba(255, 255, 255, 0.05);
   color: white;
-  appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  background-repeat: no-repeat;
   background-position: right 16px center;
   background-size: 16px;
   
@@ -642,12 +630,7 @@ const SubmitButton = styled.button`
     transform: translateY(-4px);
   }
   
-  &:disabled {
-    background-color: #7d3535;
-    cursor: not-allowed;
-    transform: none;
-    color: rgba(255, 255, 255, 0.5);
-  }
+
 `;
 
 export default EditProfile;
