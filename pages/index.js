@@ -35,7 +35,7 @@ export default function Home() {
         <FeatureTitle>Everything you need for  <span>an amazing living experience!</span></FeatureTitle>
         <FeatureGrid>
           <FeatureCard>
-            <FeatureIcon>𖠋𖠋</FeatureIcon>
+            <FeatureIcon>🗣️</FeatureIcon>
             <FeatureTitle>Find Roommates</FeatureTitle>
             <FeatureDescription>Find roommates to live with!</FeatureDescription>
           </FeatureCard>
@@ -45,7 +45,7 @@ export default function Home() {
             <FeatureDescription>Manage chores with your roommates!</FeatureDescription>
           </FeatureCard>
           <FeatureCard>
-            <FeatureIcon>𖠋𖠋</FeatureIcon>
+            <FeatureIcon>$</FeatureIcon>
             <FeatureTitle>Manage Expenses</FeatureTitle>
             <FeatureDescription>Manage expenses with your roommates!</FeatureDescription>
           </FeatureCard>
