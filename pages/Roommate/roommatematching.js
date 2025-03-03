@@ -13,7 +13,6 @@ const SimpleRoommateMatching = () => {
   const [userProfile, setUserProfile] = useState(null)
   const [potentialMatches, setPotentialMatches] = useState([])
   const [currentMatch, setCurrentMatch] = useState(null)
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [matchList, setMatchList] = useState([])
   useEffect(() => {
@@ -36,7 +35,7 @@ const SimpleRoommateMatching = () => {
       } catch (err) {
         console.error('Error fetching profile:', err)
         setError('Failed to load profile data. Please try again.')
-        setLoading(false)
+       
       }
     }
 
@@ -62,12 +61,9 @@ const SimpleRoommateMatching = () => {
           setCurrentMatch(matches[0])
         }
         await fetchExistingMatches()
-        
-        setLoading(false)
       } catch (err) {
         console.error('Error fetching matches:', err)
         setError('Failed to load potential roommates. Please try again.')
-        setLoading(false)
       }
     }
     
@@ -241,11 +237,7 @@ const SimpleRoommateMatching = () => {
       <Navbar />
       <ContentContainer>
         <PageTitle>Find Your Roommate at {userProfile?.university}</PageTitle>
-        {loading ? (
-          <LoadingMessage>Loading potential roommates...</LoadingMessage>
-        ) : error ? (
-          <ErrorMessage>{error}</ErrorMessage>
-        ) : (
+         (
           <MainContent>
             <MatchingSection>
               <SectionTitle>Potential Roommates</SectionTitle>
@@ -348,7 +340,7 @@ const SimpleRoommateMatching = () => {
               )}
             </MatchesSection>
           </MainContent>
-        )}
+        )
       </ContentContainer>
     </PageContainer>
   )
@@ -579,12 +571,7 @@ const NoMoreMatches = styled.div`
   border-radius: 8px;
 `;
 
-const LoadingMessage = styled.div`
-  color: white;
-  font-size: 18px;
-  text-align: center;
-  padding: 40px;
-`;
+
 
 const ErrorMessage = styled.div`
   color: #ff6b6b;

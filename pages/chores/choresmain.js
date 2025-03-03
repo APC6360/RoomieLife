@@ -13,7 +13,7 @@ const Chores = () => {
   const [newChore, setNewChore] = useState('')
   const [newAssignee, setNewAssignee] = useState('')
   const [newDueDate, setNewDueDate] = useState('')
-  const [loading, setLoading] = useState(true)
+ 
   const [error, setError] = useState('')
 
   // Check if user is authenticated
@@ -37,9 +37,7 @@ const Chores = () => {
       } catch (err) {
         console.error('Error fetching chores:', err)
         setError('Failed to load chores. Please try again.')
-      } finally {
-        setLoading(false)
-      }
+      } 
     }
 
     fetchChores()
@@ -149,9 +147,7 @@ const Chores = () => {
             </AddChoreSection>
             
             <ChoresContainer>
-              {loading ? (
-                <LoadingMessage>Loading chores...</LoadingMessage>
-              ) : chores.length === 0 ? (
+              {chores.length === 0 ? (
                 <EmptyState>
                   <EmptyStateText>No chores added yet</EmptyStateText>
                   <EmptyStateSubtext>Add your first chore using the form above</EmptyStateSubtext>
@@ -367,18 +363,13 @@ const DeleteButton = styled.button`
   align-items: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  
   &:hover {
     background-color: rgba(255, 107, 107, 0.3);
     color: white;
   }
 `;
 
-const LoadingMessage = styled.div`
-  color: rgba(255, 255, 255, 0.7);
-  text-align: center;
-  padding: 40px 0;
-`;
+
 
 const EmptyState = styled.div`
   display: flex;

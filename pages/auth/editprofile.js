@@ -18,12 +18,12 @@ const EditProfile = () => {
   const [universities, setUniversities] = useState([]);
   const [filteredUniversities, setFilteredUniversities] = useState([]);
   const [isLoadingUniversities, setIsLoadingUniversities] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showUniversityDropdown, setShowUniversityDropdown] = useState(false);
   const [bio, setBio] = useState('');
   const [profilePicture, setProfilePicture] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
   const universityInputRef = useRef(null);
   const dropdownRef = useRef(null);
