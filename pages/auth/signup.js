@@ -6,14 +6,11 @@ import { isEmailInUse, register} from '@/backend/Auth'
 import Link from 'next/link'
 import Navbar from '@/components/Dashboard/Navbar'
 const Signup = () => {
-
   const {user, setUser } = useStateContext()
   const [ email, setEmail ] = useState('')
   const [ password, setPassword ] = useState('')
   const [ error, setError ] = useState('')
-
   const router = useRouter()
-
   async function validateEmail(){
     const emailRegex = /^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
     if(emailRegex.test(email) == false ){
