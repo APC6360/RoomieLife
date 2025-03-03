@@ -17,23 +17,25 @@ const Navbar = () => {
     <Nav>
       <LeftSide>
         <Home></Home>
-      <RoomieLife href="/">RoomieLife</RoomieLife>
+      <RoomieLife href="/dashboard">Roomie<span>Life</span></RoomieLife>
       </LeftSide>
       <NavLinks>
         {user ? (
           <>
           <ButtonLink href="/dashboard">Dashboard</ButtonLink>
           <ButtonLink href='/chores/choresmain'>Chores</ButtonLink>
+          <ButtonLink href="/about">About</ButtonLink>
           <ButtonLinkasButton onClick={handleLogout}>Logout</ButtonLinkasButton>
           </>
         ) : (
           <>
           <ButtonLink href="/auth/signup">Sign Up</ButtonLink>
           <ButtonLink href="/auth/login">Login</ButtonLink>
+          <ButtonLink href="/about">About</ButtonLink>
           </>
         )}
         
-        <ButtonLink href="/about">About</ButtonLink>
+        
         
         
       </NavLinks>
@@ -50,7 +52,10 @@ const RoomieLife = styled(Link)`
   font-size: 20px;
   font-weight: bold;
   text-decoration: none;
-  color: black;
+  color: white;
+  span {
+    color:rgb(32, 31, 31);;
+  }
   `
   
 
@@ -59,9 +64,10 @@ const Nav = styled.nav`
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem 1rem 2rem;
-  background-color: #F5F7FA;
+  background-color: rgb(255, 107, 107);
   color: white;
   font-family: 'Gill Sans MT';
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);;
   
 
 
@@ -83,29 +89,30 @@ const NavLinks = styled.div`
 `;
 
 const ButtonLink = styled(Link)`
-color: black;
-background-color: #ff6b6b;
-padding: 0.5rem 1rem;
-border-radius: 4px;
-transition: background-color .3s ease-in-out;
+color: white;
+background-color: rgb(32, 31, 31);
+padding: 10px 10px;
+border-radius: 5px;
 text-decoration: none;
 
 &:hover {
+  transition: .3s ;
   background-color: #F5F7FA;
   color: #ff6b6b;
   font-weight: bold
 }
 `;
 const ButtonLinkasButton = styled.button`
-color: black;
-background-color: #ff6b6b;
-padding: 0.5rem 1rem;
-border-radius: 4px;
-transition: background-color .3s ease-in-out;
+color: white;
+background-color: rgb(32, 31, 31);
+padding: 10px 10px;
+border-radius: 5px;
+border-style: none;
 text-decoration: none;
 font-family: 'Gill Sans MT';
 
 &:hover {
+  transition: .3s;
   background-color: #F5F7FA;
   color: #ff6b6b;
   font-weight: bold

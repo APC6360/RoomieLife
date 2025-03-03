@@ -20,4 +20,3 @@ const firebaseConfig = {
  export const database = getFirestore(app);
  export const analytics = () => getAnalytics(app);
 
-// export default app
