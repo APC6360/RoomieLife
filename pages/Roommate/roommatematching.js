@@ -139,31 +139,49 @@ const SimpleRoommateMatching = () => {
     }
   }
   
-  const handleMakeRoommate = async (matchId) => { //handles the make roommate button
+  const handleMakeRoommate = async (matchId) => {
     try {
-      const userMatchesRef = doc(database, 'roomateMatches', user.uid)
-      const userMatchesSnapshot = await getDoc(userMatchesRef)
-
+      // Update current user's data
+      const userMatchesRef = doc(database, 'roomateMatches', user.uid);
+      const userMatchesSnapshot = await getDoc(userMatchesRef);
+  
       if (userMatchesSnapshot.exists()) {
         await updateDoc(userMatchesRef, {
-          matches: arrayUnion(matchId),
           roommates: arrayUnion(matchId)
-        })
+        });
       } else {
         await setDoc(userMatchesRef, {
           likes: [],
           dislikes: [],
           matches: [matchId],
           roommates: [matchId]
-        })
+        });
       }
+  
+      // Update the matched user's data
+      const matchedUserRef = doc(database, 'roomateMatches', matchId);
+      const matchedUserSnapshot = await getDoc(matchedUserRef);
+  
+      if (matchedUserSnapshot.exists()) {
+        await updateDoc(matchedUserRef, {
+          roommates: arrayUnion(user.uid)
+        });
+      } else {
+        await setDoc(matchedUserRef, {
+          likes: [],
+          dislikes: [],
+          matches: [user.uid],
+          roommates: [user.uid]
+        });
+      }
+  
+      alert("You are now roommates!");
+    } catch (err) {
+      console.error('Error updating roommate:', err);
+      setError('Failed to save your choice. Please try again.');
     }
-    catch (err) {
-      console.error('Error updating roommate:', err)
-      setError('Failed to save your choice. Please try again.')
-    }
-
   }
+
   const handleDislike = async () => {
     if (!currentMatch) return
     
@@ -316,8 +334,8 @@ const SimpleRoommateMatching = () => {
                           </SmallProfilePlaceholder>
                         )}
                         <MatchName>{match.firstName} {match.lastName}</MatchName>
-                        <TempButton onClick={handleMakeRoommate(matchId)}>
-                          temp
+                        <TempButton onClick={() => handleMakeRoommate(matchId)}>
+                          Make Roommate
                         </TempButton>
                       </MatchListItem>
                     )
