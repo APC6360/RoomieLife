@@ -1,60 +1,60 @@
-import React, { useState, useRef, useEffect } from 'react'
-import styled from 'styled-components'
-import { useRouter } from 'next/router'
-import { useStateContext } from '@/context/StateContext'
-import { doc, setDoc } from 'firebase/firestore'
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { database, storage } from '@/backend/Firebase'
-import Navbar from '@/components/Dashboard/Navbar'
+import React, { useState, useRef, useEffect } from 'react';
+import styled from 'styled-components';
+import { useRouter } from 'next/router';
+import { useStateContext } from '@/context/StateContext';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { database, storage } from '@/backend/Firebase';
+import Navbar from '@/components/Dashboard/Navbar';
 
-const CreateProfile = () => {
-  const { user } = useStateContext()
-  const router = useRouter()
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [birthday, setBirthday] = useState('')
-  const [university, setUniversity] = useState('')
-  const [universitySearch, setUniversitySearch] = useState('')
-  const [universities, setUniversities] = useState([])
-  const [filteredUniversities, setFilteredUniversities] = useState([])
-  const [isLoadingUniversities, setIsLoadingUniversities] = useState(false)
-  const [showUniversityDropdown, setShowUniversityDropdown] = useState(false)
-  const [bio, setBio] = useState('')
-  const [profilePicture, setProfilePicture] = useState(null)
-  const [previewUrl, setPreviewUrl] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const fileInputRef = useRef(null)
-  const universityInputRef = useRef(null)
-  const dropdownRef = useRef(null)
-  const [smokingPreference, setSmokingPreference] = useState('')
-  const [petsPreference, setPetsPreference] = useState('')
-  const [noisePreference, setNoisePreference] = useState('')
-  const [cleanlinessPreference, setCleanlinessPreference] = useState('')
+const EditProfile = () => {
+  const { user } = useStateContext();
+  const router = useRouter();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [birthday, setBirthday] = useState('');
+  const [university, setUniversity] = useState('');
+  const [universitySearch, setUniversitySearch] = useState('');
+  const [universities, setUniversities] = useState([]);
+  const [filteredUniversities, setFilteredUniversities] = useState([]);
+  const [isLoadingUniversities, setIsLoadingUniversities] = useState(false);
+  const [showUniversityDropdown, setShowUniversityDropdown] = useState(false);
+  const [bio, setBio] = useState('');
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef(null);
+  const universityInputRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const [smokingPreference, setSmokingPreference] = useState('');
+  const [petsPreference, setPetsPreference] = useState('');
+  const [noisePreference, setNoisePreference] = useState('');
+  const [cleanlinessPreference, setCleanlinessPreference] = useState('');
   const smokingOptions = [
     "I don't smoke and prefer non-smokers",
     "I don't smoke but don't mind smokers",
     "I smoke occasionally",
     "I smoke regularly"
-  ]
+  ];
   const petsOptions = [
     "I don't have pets and prefer no pets",
     "I don't have pets but don't mind them",
     "I have pets and they will live with me",
     "I have pets but they won't live with me"
-  ]
+  ];
   const noiseOptions = [
     "I prefer a quiet living environment",
     "I don't mind occasional noise",
     "I'm often noisy (music, guests, etc.)",
     "I'm very quiet and need a quiet environment"
-  ]
+  ];
   const cleanlinessOptions = [
     "I'm very neat and organized",
     "I'm generally tidy",
     "I'm somewhat messy but clean common areas",
     "I'm not particularly concerned with tidiness"
-  ]
+  ];
   const popularUniversities = [
     "Harvard University",
     "Stanford University",
@@ -66,174 +66,195 @@ const CreateProfile = () => {
     "New York University",
     "University of Florida",
     "University of Washington"
-  ]
+  ];
 
   useEffect(() => {
     if (!user) {
-      router.push('/auth/login')
+      router.push('/auth/login');
+      return;
     }
-  }, [user, router])
-
-  useEffect(() => {
-    setUniversities(popularUniversities)
-    setFilteredUniversities(popularUniversities)
+    setUniversities(popularUniversities);
+    setFilteredUniversities(popularUniversities);
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
           universityInputRef.current && !universityInputRef.current.contains(event.target)) {
-        setShowUniversityDropdown(false)
+        setShowUniversityDropdown(false);
       }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    const fetchUserProfile = async () => {
+      try {
+        const docRef = doc(database, 'userProfiles', user.uid);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setFirstName(data.firstName || '');
+          setLastName(data.lastName || '');
+          setBirthday(data.birthday || '');
+          setUniversity(data.university || '');
+          setUniversitySearch(data.university || '');
+          setBio(data.bio || '');
+          setPreviewUrl(data.profilePicture || '');
+          if (data.lifestylePreferences) {
+            setSmokingPreference(data.lifestylePreferences.smoking || '');
+            setPetsPreference(data.lifestylePreferences.pets || '');
+            setNoisePreference(data.lifestylePreferences.noise || '');
+            setCleanlinessPreference(data.lifestylePreferences.cleanliness || '');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        setError('Failed to load profile data');
+      }
+    };
+    
+    fetchUserProfile();
+    
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [user, router]);
 
   const fetchUniversities = async (query) => {
-    if (!query || query.length < 2) return
+    if (!query || query.length < 2) return;
     
-    setIsLoadingUniversities(true)
+    setIsLoadingUniversities(true);
     try {
-      const response = await fetch(`http://universities.hipolabs.com/search?name=${encodeURIComponent(query)}`)
-      const data = await response.json()
-      const universityNames = [...new Set(data.map(uni => uni.name))]
+      const response = await fetch(`http://universities.hipolabs.com/search?name=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      const universityNames = [...new Set(data.map(uni => uni.name))];
       setUniversities(prev => {
-        const combined = [...popularUniversities, ...universityNames]
-        return [...new Set(combined)]
-      })
+        const combined = [...popularUniversities, ...universityNames];
+        return [...new Set(combined)];
+      });
       
-      setFilteredUniversities(universityNames.slice(0, 10)) 
+      setFilteredUniversities(universityNames.slice(0, 10)); 
     } catch (error) {
-      console.error('Error fetching universities:', error)
+      console.error('Error fetching universities:', error);
     } finally {
-      setIsLoadingUniversities(false)
+      setIsLoadingUniversities(false);
     }
-  }
+  };
 
   const handleUniversitySearch = (e) => {
-    const query = e.target.value
-    setUniversitySearch(query)
+    const query = e.target.value;
+    setUniversitySearch(query);
     
     if (query.length < 2) {
-      setFilteredUniversities(popularUniversities)
-      return
+      setFilteredUniversities(popularUniversities);
+      return;
     }
     
     const filtered = universities.filter(uni => 
       uni.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 10)
+    ).slice(0, 10);
     
-    setFilteredUniversities(filtered)
+    setFilteredUniversities(filtered);
+    
     const handler = setTimeout(() => {
-      fetchUniversities(query)
-    }, 300)
+      fetchUniversities(query);
+    }, 300);
     
-    return () => clearTimeout(handler)
-  }
+    return () => clearTimeout(handler);
+  };
 
   const handleUniversitySelect = (selected) => {
-    setUniversity(selected)
-    setUniversitySearch(selected)
-    setShowUniversityDropdown(false)
-  }
+    setUniversity(selected);
+    setUniversitySearch(selected);
+    setShowUniversityDropdown(false);
+  };
 
   const handlePictureChange = (e) => {
-    const file = e.target.files[0]
+    const file = e.target.files[0];
     if (!file.type.match('image.*')) {
-      setError('Only image files are allowed.')
-      return
+      setError('Only image files are allowed.');
+      return;
     }
-    setProfilePicture(file)
-    const fileReader = new FileReader()
+    setProfilePicture(file);
+    const fileReader = new FileReader();
     fileReader.onload = () => {
-      setPreviewUrl(fileReader.result)
-    }
-    fileReader.readAsDataURL(file)
-  }
+      setPreviewUrl(fileReader.result);
+    };
+    fileReader.readAsDataURL(file);
+  };
 
   const handleSelectPicture = () => {
-    fileInputRef.current.click()
-  }
+    fileInputRef.current.click();
+  };
 
   const validateForm = () => {
     if (!firstName || !lastName || !birthday || !university) {
-      setError('Please fill in all required fields')
-      return false
+      setError('Please fill in all required fields');
+      return false;
     }
-    setError('')
-    return true
-  }
+    setError('');
+    return true;
+  };
 
   const calculateAge = (birthdate) => {
-    const today = new Date()
-    const birthDate = new Date(birthdate)
-    let age = today.getFullYear() - birthDate.getFullYear()
-    const monthDiff = today.getMonth() - birthDate.getMonth()
+    const today = new Date();
+    const birthDate = new Date(birthdate);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--
+      age--;
     }
-    return age
-  }
+    return age;
+  };
 
-  const handleSubmitProfile = async () => {
-    if (!user || !user.uid) {
-      setError('You need to be logged in')
-      router.push('/auth/login')
-      return
-    }
-
-    if (!validateForm()) return
-
-    setLoading(true)
-
+  const handleUpdateProfile = async () => {
+    if (!validateForm()) return;
+    
+    setLoading(true);
+    
     try {
-      let profileImageUrl = ''
+      let profileImageUrl = previewUrl;
       if (profilePicture) {
-        const storageRef = ref(storage, `profile_pictures/${user.uid}`)
-        await uploadBytes(storageRef, profilePicture)
-        profileImageUrl = await getDownloadURL(storageRef)
+        const storageRef = ref(storage, `profile_pictures/${user.uid}`);
+        await uploadBytes(storageRef, profilePicture);
+        profileImageUrl = await getDownloadURL(storageRef);
       }
 
-      const userProfileData = {
+      await updateDoc(doc(database, 'userProfiles', user.uid), {
         firstName,
         lastName,
         birthday,
-        age: calculateAge(birthday),
         university,
         bio,
+        age: calculateAge(birthday),
         profilePicture: profileImageUrl,
-        createdAt: new Date().toISOString(),
-        userId: user.uid,
-        email: user.email,
+        updatedAt: new Date().toISOString(),
         lifestylePreferences: {
           smoking: smokingPreference,
           pets: petsPreference,
           noise: noisePreference,
           cleanliness: cleanlinessPreference
         }
-      }
-
-      await setDoc(doc(database, 'userProfiles', user.uid), userProfileData)
-      router.push('/dashboard')
+      });
+      
+      router.push('/dashboard');
     } catch (err) {
-      console.error('Error:', err)
-      setError('Error creating profile')
+      console.error('Error:', err);
+      setError('Error updating profile');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (!user) {
-    return null
+    return null;
   }
- 
+
   return (
     <PageContainer>
       <Navbar />
       <FormContainer>
         <FormCard>
-          <FormHeader>Customize Your <span>Profile</span></FormHeader>
-          <FormSubtitle>Tell us a bit about yourself</FormSubtitle>
+          <FormHeader>Edit Your <span>Profile</span></FormHeader>
+          <FormSubtitle>Update your profile information</FormSubtitle>
           {error && <ErrorMessage>{error}</ErrorMessage>}
           
           <ProfilePictureSection>
@@ -387,20 +408,20 @@ const CreateProfile = () => {
           </FormGroup>
 
           <SubmitButton 
-            onClick={handleSubmitProfile}
+            onClick={handleUpdateProfile}
             disabled={loading}
           >
-            {loading ? 'Creating Profile...' : 'Complete Profile'}
+            {loading ? 'Updating Profile...' : 'Update Profile'}
           </SubmitButton>
         </FormCard>
       </FormContainer>
     </PageContainer>
-  )
-}
+  );
+};
 
 const ProfileImage = ({ src, alt }) => (
   <img src={src} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-)
+);
 
 const PageContainer = styled.div`
   background-color: #121212;
@@ -629,4 +650,4 @@ const SubmitButton = styled.button`
   }
 `;
 
-export default CreateProfile
+export default EditProfile;

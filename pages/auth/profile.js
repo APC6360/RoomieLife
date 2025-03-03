@@ -158,7 +158,7 @@ const Profile = () => {
               </LifestyleSection>
               
               <ButtonsContainer>
-                <EditButton onClick={() => router.push('/auth/createprofile')}>
+                <EditButton onClick={() => router.push('/auth/editprofile')}>
                   Edit Profile
                 </EditButton>
                 <BackButton onClick={() => router.push('/dashboard')}>
