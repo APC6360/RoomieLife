@@ -22,6 +22,7 @@ const Navbar = () => {
       <NavLinks>
         {user ? (
           <>
+          <ButtonLink href="/auth/profile">Profile</ButtonLink>
           <ButtonLink href="/dashboard">Dashboard</ButtonLink>
           <ButtonLink href='/chores/choresmain'>Chores</ButtonLink>
           <ButtonLink href="/about">About</ButtonLink>

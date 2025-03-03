@@ -36,6 +36,7 @@ const Signup = () => {
   async function handleSignup(){
     const isValidEmail = await validateEmail()
     // console.log('isValidEmail', isValidEmail)
+
     if(!isValidEmail){ return; }
     
     try{
