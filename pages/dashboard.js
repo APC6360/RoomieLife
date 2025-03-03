@@ -13,22 +13,46 @@ export default function Dashboard() {
   const [roommateCount, setRoommateCount] = useState(0)
   const [choreCount, setChoreCount] = useState(0)
   const [expenseCount, setExpenseCount] = useState(0)
+  const [pendingExpensesTotal, setPendingExpensesTotal] = useState(0)
 
   useEffect(() => {
     if (user) {
       fetchRoommateData()
       fetchChoreData()
+      fetchExpenseData()
     }
   }, [user])
 
   const fetchChoreData = async () => {
     try {
       const choresRef = collection(database, 'sharedChores')
-      const q = query (choresRef, where('assigneeId','==', user.uid), where('completed', '==', false))
+      const q = query(choresRef, where('assigneeId','==', user.uid), where('completed', '==', false))
       const querySnapshot = await getDocs(q)
       setChoreCount(querySnapshot.size)
     } catch (err) {
       console.error('Error fetching chore data:', err)
+    }
+  }
+
+  const fetchExpenseData = async () => {
+    try {
+      const expensesRef = collection(database, 'sharedExpenses')
+      const q = query(expensesRef, where('householdIds', 'array-contains', user.uid), where('settled', '==', false))
+      const querySnapshot = await getDocs(q)
+      
+      let total = 0
+      querySnapshot.docs.forEach(doc => {
+        const expenseData = doc.data()
+        // Only count expenses not paid by the current user
+        if (expenseData.payerId !== user.uid) {
+          total += expenseData.amount
+        }
+      })
+      
+      setExpenseCount(querySnapshot.size)
+      setPendingExpensesTotal(total)
+    } catch (err) {
+      console.error('Error fetching expense data:', err)
     }
   }
 
@@ -119,8 +143,8 @@ export default function Dashboard() {
                 <SummaryValue>{choreCount}</SummaryValue>
               </SummaryItem>
               <SummaryItem>
-                <SummaryLabel>Pending Expenses</SummaryLabel>
-                <SummaryValue>$45</SummaryValue>
+                <SummaryLabel>Total Expenses</SummaryLabel>
+                <SummaryValue>${pendingExpensesTotal.toFixed(2)}</SummaryValue>
               </SummaryItem>
               <SummaryItem>
                 <SummaryLabel>Roommates</SummaryLabel>
