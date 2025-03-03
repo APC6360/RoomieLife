@@ -30,8 +30,9 @@ const Navbar = () => {
           <>
           <ButtonLink href="/auth/profile">Profile</ButtonLink>
           <ButtonLink href="/dashboard">Dashboard</ButtonLink>
-          <ButtonLink href="/Roommate/roommatematching">Roommate Matching</ButtonLink>
-          <ButtonLink href='/Roommate/choresmain'>Chores</ButtonLink>
+          <ButtonLink href="/features/roommatematching">Roommate Matching</ButtonLink>
+          <ButtonLink href='/features/choresmain'>Chores</ButtonLink>
+          <ButtonLink href='/features/expenses'>Expenses</ButtonLink>
           <ButtonLinkasButton onClick={handleLogout}>Logout</ButtonLinkasButton>
           </>
         ) : (
@@ -69,7 +70,7 @@ const Nav = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem 1rem 2rem;
+  padding: 1rem 1rem 1rem 1rem;
   background-color: rgb(255, 107, 107);
   color: white;
   font-family: 'Gill Sans MT';

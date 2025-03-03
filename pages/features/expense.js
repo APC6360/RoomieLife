@@ -21,7 +21,6 @@ const expense = () => {
   
   useEffect(() => {
     
-
     const fetchRoommates = async () => {
       try {
         const roommateMatchesRef = doc(database, 'roomateMatches', user.uid)

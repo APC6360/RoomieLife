@@ -43,7 +43,6 @@ export default function Dashboard() {
       let total = 0
       querySnapshot.docs.forEach(doc => {
         const expenseData = doc.data()
-        // Only count expenses not paid by the current user
         if (expenseData.payerId !== user.uid) {
           total += expenseData.amount
         }
@@ -58,7 +57,7 @@ export default function Dashboard() {
 
   const fetchRoommateData = async () => {
     try {
-      // Get roommate matches document
+      
       const matchesRef = doc(database, 'roomateMatches', user.uid)
       const matchesSnapshot = await getDoc(matchesRef)
       
@@ -67,7 +66,7 @@ export default function Dashboard() {
         const roommateIds = matchData.roommates || []
         setRoommateCount(roommateIds.length)
         
-        // Fetch actual roommate profile data
+        
         const roommateProfiles = []
         for (const roommateId of roommateIds) {
           const profileRef = doc(database, 'userProfiles', roommateId)
@@ -110,7 +109,7 @@ export default function Dashboard() {
               <CardIcon>🏠</CardIcon>
               <CardTitle>Roommates</CardTitle>
               <CardDescription>Find and connect with potential roommates</CardDescription>
-              <CardButton href="/Roommate/roommatematching">Find Roommates</CardButton>
+              <CardButton href="/features/roommatematching">Find Roommates</CardButton>
             </DashboardCard>
 
             <DashboardCard>
@@ -124,14 +123,14 @@ export default function Dashboard() {
               <CardIcon>✔️</CardIcon>
               <CardTitle>Chores</CardTitle>
               <CardDescription>Track and manage household responsibilities</CardDescription>
-              <CardButton href="/Roommate/choresmain">Manage Chores</CardButton>
+              <CardButton href="/features/choresmain">Manage Chores</CardButton>
             </DashboardCard>
 
             <DashboardCard>
               <CardIcon>💰</CardIcon>
               <CardTitle>Expenses</CardTitle>
               <CardDescription>Track shared expenses and payments</CardDescription>
-              <CardButton href="/Roommate/expense">Manage Expenses</CardButton>
+              <CardButton href="/features/expense">Manage Expenses</CardButton>
             </DashboardCard>
           </DashboardCards>
 
