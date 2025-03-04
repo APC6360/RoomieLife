@@ -14,6 +14,8 @@ export default function Dashboard() {
   const [choreCount, setChoreCount] = useState(0)
   const [expenseCount, setExpenseCount] = useState(0)
   const [pendingExpensesTotal, setPendingExpensesTotal] = useState(0)
+  const [randomCocktail, setRandomCocktail] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -90,6 +92,19 @@ export default function Dashboard() {
     }
   }
 
+  const fetchRandomCocktail = () => {
+    setLoading(true)
+    fetch('https://www.thecocktaildb.com/api/json/v1/1/random.php')
+      .then(response => response.json())
+      .then(data => {
+        setRandomCocktail(data.drinks[0])
+        setLoading(false)
+      })
+      .catch(error => {
+        console.error('Error fetching cocktail:', error)
+        setLoading(false)
+      })
+  }
   
   return (
     <>
@@ -131,6 +146,26 @@ export default function Dashboard() {
               <CardTitle>Expenses</CardTitle>
               <CardDescription>Track shared expenses and payments</CardDescription>
               <CardButton href="/features/expense">Manage Expenses</CardButton>
+            </DashboardCard>
+            
+            <DashboardCard>
+              <CardIcon>🍹</CardIcon>
+              <CardTitle>Random Cocktail</CardTitle>
+              <CardDescription>Discover a random drink recipe for your next roomie night</CardDescription>
+              <CocktailButton onClick={fetchRandomCocktail}>
+                {loading ? 'Loading...' : 'Generate Random Cocktail'}
+              </CocktailButton>
+              
+              {randomCocktail && (
+                <CocktailInfo>
+                  <CocktailName>{randomCocktail.strDrink}</CocktailName>
+                  {randomCocktail.strDrinkThumb && (
+                    <CocktailImage src={randomCocktail.strDrinkThumb} alt={randomCocktail.strDrink} />
+                  )}
+                  <CocktailCategory>Category: {randomCocktail.strCategory}</CocktailCategory>
+                  <CocktailGlass>Glass: {randomCocktail.strGlass}</CocktailGlass>
+                </CocktailInfo>
+              )}
             </DashboardCard>
           </DashboardCards>
 
@@ -282,6 +317,7 @@ const CardButton = styled(Link)`
   }
 `;
 
+
 const DashboardSummary = styled.div`
   background-color: rgba(255, 255, 255, 0.1);
   padding: 30px;
@@ -420,4 +456,52 @@ const RoommateButton = styled(Link)`
   &:hover {
     font-weight: bold;
   }
+`;
+
+
+const CocktailButton = styled.button`
+  background-color: #ff6b6b;
+  color: black;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  text-decoration: none;
+  margin-top: auto;
+  border: none;
+  cursor: pointer;
+  
+  &:hover {
+    font-weight: bold;
+  }
+`;
+
+const CocktailInfo = styled.div`
+  margin-top: 20px;
+  width: 100%;
+`;
+
+const CocktailName = styled.h3`
+  font-size: 20px;
+  color: white;
+  margin-bottom: 10px;
+`;
+
+const CocktailImage = styled.img`
+  width: 150px;
+  height: 150px;
+  border-radius: 10px;
+  margin: 10px 0;
+  object-fit: cover;
+`;
+
+const CocktailCategory = styled.p`
+  font-size: 14px;
+  color: grey;
+  margin-bottom: 5px;
+`;
+
+const CocktailGlass = styled.p`
+  font-size: 14px;
+  color: grey;
+  margin-bottom: 5px;
 `;
