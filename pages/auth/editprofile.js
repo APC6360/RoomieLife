@@ -123,7 +123,7 @@ const EditProfile = () => {
     
     setIsLoadingUniversities(true);
     try {
-      const response = await fetch(`http://universities.hipolabs.com/search?name=${encodeURIComponent(query)}`);
+      const response = await fetch(`/pages/api/universities?query=${encodeURIComponent(query)}`)
       const data = await response.json();
       const universityNames = [...new Set(data.map(uni => uni.name))];
       setUniversities(prev => {
