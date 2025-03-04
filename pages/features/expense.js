@@ -239,12 +239,13 @@ const expense = () => {
                         checked={expense.settled}
                         onChange={() => toggleExpenseStatus(expense.id, expense.settled)} //toggles the status of the expense
                       />
-                      <ExpenseDetails>
+                  
+                      <ExpenseDetails> 
                         <ExpenseDescription settled={expense.settled}>
-                          {expense.description}
-                        </ExpenseDescription>
-                        <ExpenseAmount settled={expense.settled}>
-                          ${expense.amount.toFixed(2)} //formats the amount to 2 decimal places
+                          {expense.description} 
+                        </ExpenseDescription> 
+                        <ExpenseAmount settled={expense.settled}> 
+                          ${expense.amount.toFixed(2)} 
                         </ExpenseAmount>
                         <ExpenseMetadata>
                           <ExpensePayer>
