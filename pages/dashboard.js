@@ -25,7 +25,7 @@ export default function Dashboard() {
     }
   }, [user])
 
-  const fetchChoreData = async () => {
+  const fetchChoreData = async () => { // Fetches chores assigned to the user
     try {
       const choresRef = collection(database, 'sharedChores')
       const q = query(choresRef, where('assigneeId','==', user.uid), where('completed', '==', false))
@@ -36,7 +36,7 @@ export default function Dashboard() {
     }
   }
 
-  const fetchExpenseData = async () => {
+  const fetchExpenseData = async () => { // Fetches expenses that the user has to pay
     try {
       const expensesRef = collection(database, 'sharedExpenses')
       const q = query(expensesRef, where('householdIds', 'array-contains', user.uid), where('settled', '==', false))
@@ -57,7 +57,7 @@ export default function Dashboard() {
     }
   }
 
-  const fetchRoommateData = async () => {
+  const fetchRoommateData = async () => { // Fetches the user's roommates
     try {
       
       const matchesRef = doc(database, 'roomateMatches', user.uid)
@@ -92,7 +92,7 @@ export default function Dashboard() {
     }
   }
 
-  const fetchRandomCocktail = () => {
+  const fetchRandomCocktail = () => { // Fetches a random cocktail recipe from API
     setLoading(true)
     fetch('https://www.thecocktaildb.com/api/json/v1/1/random.php')
       .then(response => response.json())
@@ -118,8 +118,8 @@ export default function Dashboard() {
         
 
         <DashboardContent>
-          <DashboardCards>
-
+          <DashboardCards> 
+        
             <DashboardCard>
               <CardIcon>🏠</CardIcon>
               <CardTitle>Roommates</CardTitle>
@@ -160,7 +160,7 @@ export default function Dashboard() {
                 <CocktailInfo>
                   <CocktailName>{randomCocktail.strDrink}</CocktailName>
                   {randomCocktail.strDrinkThumb && (
-                    <CocktailImage src={randomCocktail.strDrinkThumb} alt={randomCocktail.strDrink} />
+                    <CocktailImage src={randomCocktail.strDrinkThumb} alt={randomCocktail.strDrink} /> // Display the cocktail image if available
                   )}
                   <CocktailCategory>Category: {randomCocktail.strCategory}</CocktailCategory>
                   <CocktailGlass>Glass: {randomCocktail.strGlass}</CocktailGlass>
