@@ -17,14 +17,14 @@ const Chores = () => {
   const [roommates, setRoommates] = useState([])
   const [roommateProfiles, setRoommateProfiles] = useState([])
 
-  
+  //all of the above data is being fetched from the database
   useEffect(() => {
     if (!user) {
       router.push('/auth/login')
       return
     }
 
-    const fetchRoommates = async () => {
+    const fetchRoommates = async () => { // fetches the roommates
       try {
         const roommateMatchesRef = doc(database, 'roomateMatches', user.uid)
         const matchesSnapshot = await getDoc(roommateMatchesRef)
@@ -32,7 +32,7 @@ const Chores = () => {
         if (matchesSnapshot.exists()) {
           const matchData = matchesSnapshot.data()
           const roommates = matchData.roommates || []
-          setRoommates([user.uid, ...roommates])
+          setRoommates([user.uid, ...roommates]) 
 
         
           const profiles = []
@@ -57,7 +57,7 @@ const Chores = () => {
     }
 
    
-    const fetchChores = async () => {
+    const fetchChores = async () => { // fetches the chores
       try {
         await fetchRoommates()
         
@@ -80,7 +80,7 @@ const Chores = () => {
   }, [user, router])
 
   
-  const handleAddChore = async () => {
+  const handleAddChore = async () => { // adds a chore
     if (!newChore) {
       setError('Chore description is required')
       return
@@ -98,7 +98,7 @@ const Chores = () => {
         assigneeName = assignee ? `${assignee.firstName} ${assignee.lastName}` : 'Unknown'
       }
 
-      const newChoreData = {
+      const newChoreData = { // data for the new chore
         description: newChore,
         assigneeId: assigneeId,
         assigneeName: assigneeName,
@@ -124,7 +124,7 @@ const Chores = () => {
   }
 
   
-  const toggleChoreStatus = async (id, currentStatus) => {
+  const toggleChoreStatus = async (id, currentStatus) => { // toggles the status of the chore
     try {
       await updateDoc(doc(database, 'sharedChores', id), {
         completed: !currentStatus
@@ -143,7 +143,7 @@ const Chores = () => {
   }
 
   
-  const deleteChore = async (id) => {
+  const deleteChore = async (id) => { // deletes the chore
     try {
       await deleteDoc(doc(database, 'sharedChores', id))
       setChores(chores.filter(chore => chore.id !== id))
@@ -154,7 +154,7 @@ const Chores = () => {
   }
 
   
-  const formatDate = (dateString) => {
+  const formatDate = (dateString) => { // formats the date
     if (!dateString) return 'No due date'
     
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -169,7 +169,7 @@ const Chores = () => {
     if (!userId) return '0 chores'
     
     const assignedChores = chores.filter(chore => chore.assigneeId === userId).length
-    return `${assignedChores} chore${assignedChores !== 1 ? 's' : ''}`
+    return `${assignedChores} chore${assignedChores !== 1 ? 's' : ''}` // pluralize the word 'chore'
   }
 
   return (
@@ -419,7 +419,7 @@ const ChoreItem = styled.li`
   margin-bottom: 12px;
 `;
 
-const ChoreCheckbox = styled.input.attrs({ type: 'checkbox' })`
+const ChoreCheckbox = styled.input.attrs({ type: 'checkbox' })` // checkbox for the chores
   width: 20px;
   height: 20px;
   margin-right: 16px;

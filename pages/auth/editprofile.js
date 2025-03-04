@@ -67,7 +67,7 @@ const EditProfile = () => {
     "University of Florida",
     "University of Washington"
   ];
-
+  // all of the above is the data that is being used to populate the form fields
   useEffect(() => {
     if (!user) {
       router.push('/auth/login');
@@ -84,12 +84,12 @@ const EditProfile = () => {
     
     document.addEventListener('mousedown', handleClickOutside);
     
-    const fetchUserProfile = async () => {
+    const fetchUserProfile = async () => { // this function is used to fetch the user profile
       try {
         const docRef = doc(database, 'userProfiles', user.uid);
         const docSnap = await getDoc(docRef);
         
-        if (docSnap.exists()) {
+        if (docSnap.exists()) { // if the document exists, then the data is set to the state
           const data = docSnap.data();
           setFirstName(data.firstName || '');
           setLastName(data.lastName || '');
@@ -118,7 +118,7 @@ const EditProfile = () => {
     };
   }, [user, router]);
 
-  const fetchUniversities = async (query) => {
+  const fetchUniversities = async (query) => { // this function is used to fetch the universities
     if (!query || query.length < 2) return;
     
     setIsLoadingUniversities(true);
@@ -139,7 +139,7 @@ const EditProfile = () => {
     }
   };
 
-  const handleUniversitySearch = (e) => {
+  const handleUniversitySearch = (e) => { // this function is used to handle the university search
     const query = e.target.value;
     setUniversitySearch(query);
     
@@ -167,7 +167,7 @@ const EditProfile = () => {
     setShowUniversityDropdown(false);
   };
 
-  const handlePictureChange = (e) => {
+  const handlePictureChange = (e) => { // this function is used to handle the picture change
     const file = e.target.files[0];
     if (!file.type.match('image.*')) {
       setError('Only image files are allowed.');
@@ -185,7 +185,7 @@ const EditProfile = () => {
     fileInputRef.current.click();
   };
 
-  const validateForm = () => {
+  const validateForm = () => { // this function is used to validate the form
     if (!firstName || !lastName || !birthday || !university) {
       setError('Please fill in all required fields');
       return false;
@@ -194,7 +194,7 @@ const EditProfile = () => {
     return true;
   };
 
-  const calculateAge = (birthdate) => {
+  const calculateAge = (birthdate) => { // this function is used to calculate the age
     const today = new Date();
     const birthDate = new Date(birthdate);
     let age = today.getFullYear() - birthDate.getFullYear();
@@ -218,7 +218,7 @@ const EditProfile = () => {
         profileImageUrl = await getDownloadURL(storageRef);
       }
 
-      await updateDoc(doc(database, 'userProfiles', user.uid), {
+      await updateDoc(doc(database, 'userProfiles', user.uid), { // this function is used to update the user profile
         firstName,
         lastName,
         birthday,
@@ -353,7 +353,7 @@ const EditProfile = () => {
             />
           </FormGroup>
 
-          <SectionTitle>Lifestyle Preferences</SectionTitle>
+          <SectionTitle>Lifestyle Preferences</SectionTitle> 
           
           <FormGroup>
             <InputTitle>Smoking</InputTitle>
@@ -363,7 +363,7 @@ const EditProfile = () => {
             >
               <option value="">Select your preference</option>
               {smokingOptions.map((option, index) => (
-                <option key={index} value={option}>{option}</option>
+                <option key={index} value={option}>{option}</option> 
               ))}
             </Select>
           </FormGroup>
@@ -419,8 +419,8 @@ const EditProfile = () => {
   );
 };
 
-const ProfileImage = ({ src, alt }) => (
-  <img src={src} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+const ProfileImage = ({ src, alt }) => ( // this function is used to display the profile image
+  <img src={src} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> 
 );
 
 const PageContainer = styled.div`
@@ -598,7 +598,7 @@ const Select = styled.select`
     border-color: #ff6b6b;
     box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.3);
   }
-  
+
   option {
     background-color: #282828;
   }

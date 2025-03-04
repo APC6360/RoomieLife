@@ -24,7 +24,7 @@ const SimpleRoommateMatching = () => {
       router.push('/auth/login')
       return
     }
-    const fetchUserProfile = async () => {
+    const fetchUserProfile = async () => { //fetches the user profile
       try {
         const profileRef = doc(database, 'userProfiles', user.uid)
         const profileSnapshot = await getDoc(profileRef)
@@ -42,7 +42,7 @@ const SimpleRoommateMatching = () => {
       }
     }
 
-    const fetchPotentialMatches = async (profileData) => {
+    const fetchPotentialMatches = async (profileData) => { //fetches potential matches
       try {
         const matchesQuery = query(
           collection(database, 'userProfiles'),
@@ -67,7 +67,7 @@ const SimpleRoommateMatching = () => {
       }
     }
     
-    const fetchExistingMatchesAndRoommates = async (matches) => {
+    const fetchExistingMatchesAndRoommates = async (matches) => { //fetches existing matches and roommates
       try {
         const matchesRef = doc(database, 'roomateMatches', user.uid)
         const matchesSnapshot = await getDoc(matchesRef)
@@ -83,8 +83,8 @@ const SimpleRoommateMatching = () => {
           roommateUsers = matchData.roommates || []
           pendingRequests = matchData.pendingRoommateRequests || []
           
-          if (matchData.likes) processedUserIds = [...processedUserIds, ...matchData.likes]
-          if (matchData.dislikes) processedUserIds = [...processedUserIds, ...matchData.dislikes]
+          if (matchData.likes) processedUserIds = [...processedUserIds, ...matchData.likes] //if user likes someone
+          if (matchData.dislikes) processedUserIds = [...processedUserIds, ...matchData.dislikes] //if user dislikes someone
         }
         
         setMatchList(matchedUsers)
@@ -92,7 +92,7 @@ const SimpleRoommateMatching = () => {
         setPendingRoommateRequests(pendingRequests)
         setProcessedUsers([...processedUserIds, ...roommateUsers])
         
-        const filteredMatches = matches.filter(match => 
+        const filteredMatches = matches.filter(match =>  //filters matches and roommates based on user id
           !processedUserIds.includes(match.id) && 
           !roommateUsers.includes(match.id)
         )
@@ -111,7 +111,7 @@ const SimpleRoommateMatching = () => {
     fetchUserProfile()
   }, [user, router])
   
-  const handleLike = async () => {
+  const handleLike = async () => { //handles the like button
     if (!currentMatch) return
     const likedUserId = currentMatch.id
     try {
@@ -119,11 +119,11 @@ const SimpleRoommateMatching = () => {
       const userMatchesSnapshot = await getDoc(userMatchesRef)
       
       if (userMatchesSnapshot.exists()) {
-        await updateDoc(userMatchesRef, {
+        await updateDoc(userMatchesRef, { //updates the user matches
           likes: arrayUnion(likedUserId)
         })
       } else {
-        await setDoc(userMatchesRef, {
+        await setDoc(userMatchesRef, { //sets the user matches if it doesn't exist
           likes: [likedUserId],
           dislikes: [],
           matches: [],
@@ -140,11 +140,11 @@ const SimpleRoommateMatching = () => {
         
         if (otherUserData.likes && otherUserData.likes.includes(user.uid)) {
           await updateDoc(userMatchesRef, {
-            matches: arrayUnion(likedUserId)
+            matches: arrayUnion(likedUserId) //updates the user matches to the array of the liked user id
           })
           
           await updateDoc(otherUserMatchesRef, {
-            matches: arrayUnion(user.uid)
+            matches: arrayUnion(user.uid) //updates the other user matches
           })
           
           setMatchList(prevMatches => [...prevMatches, likedUserId])
@@ -187,7 +187,7 @@ const SimpleRoommateMatching = () => {
     }
   }
   
-  const handleConfirmRoommate = async (matchId) => {
+  const handleConfirmRoommate = async (matchId) => { //handles the confirm roommate button
     try {
       const matchUserRef = doc(database, 'roomateMatches', matchId)
       const matchUserSnapshot = await getDoc(matchUserRef)
@@ -210,9 +210,9 @@ const SimpleRoommateMatching = () => {
      
       const userMatchesRef = doc(database, 'roomateMatches', user.uid)
       await updateDoc(userMatchesRef, {
-        matches: arrayRemove(matchId),
+        matches: arrayRemove(matchId),  //remove the match id from the array
         pendingRoommateRequests: arrayRemove(matchId),
-        roommates: arrayUnion(matchId)
+        roommates: arrayUnion(matchId) 
       })
       
       
@@ -235,11 +235,11 @@ const SimpleRoommateMatching = () => {
   }
 
     
-const ProfileFetchRenderer = ({ matchId, render }) => {
+const ProfileFetchRenderer = ({ matchId, render }) => { //fetches the profile
   const [profile, setProfile] = useState(null)
   
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchProfile = async () => { //fetches the profile
       try {
         const profileRef = doc(database, 'userProfiles', matchId)
         const profileSnapshot = await getDoc(profileRef)
@@ -261,7 +261,7 @@ const ProfileFetchRenderer = ({ matchId, render }) => {
   return render(profile)
 }
 
-  const handleDislike = async () => {
+  const handleDislike = async () => { //handles the dislike button
     if (!currentMatch) return
     
     const dislikedUserId = currentMatch.id
@@ -387,7 +387,7 @@ const ProfileFetchRenderer = ({ matchId, render }) => {
               <SectionTitle>My Roommates ({roommateList.length})</SectionTitle>
               {roommateList.length > 0 ? (
                 <RoommatesList>
-                  {roommateList.map(roommateId => (
+                  {roommateList.map(roommateId => ( //for each roommate, display their profile information
                     <RoommateItemWrapper key={roommateId}>
                       <RoommateListItem>
                         <ProfileFetchRenderer
@@ -431,7 +431,7 @@ const ProfileFetchRenderer = ({ matchId, render }) => {
                           matchId={matchId}
                           render={(match) => (
                             <>
-                              {match?.profilePicture ? (
+                              {match?.profilePicture ? ( //if the user has a profile picture, display it
                                 <SmallProfileImage 
                                   src={match.profilePicture} 
                                   alt={`${match.firstName}'s profile`} 

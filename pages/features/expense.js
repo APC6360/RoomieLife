@@ -18,10 +18,11 @@ const expense = () => {
   const [roommates, setRoommates] = useState([])
   const [roommateProfiles, setRoommateProfiles] = useState([])
 
+  //all the data above is used to keep track of the expenses and the roommates
   
   useEffect(() => {
     
-    const fetchRoommates = async () => {
+    const fetchRoommates = async () => { //fetches the roommates
       try {
         const roommateMatchesRef = doc(database, 'roomateMatches', user.uid)
         const matchesSnapshot = await getDoc(roommateMatchesRef)
@@ -53,7 +54,7 @@ const expense = () => {
     }
 
    
-    const fetchExpenses = async () => {
+    const fetchExpenses = async () => { //fetches the expenses
       try {
         await fetchRoommates()
         
@@ -76,7 +77,7 @@ const expense = () => {
   }, [user, router])
 
   
-  const handleAddExpense = async () => {
+  const handleAddExpense = async () => { //handles the addition of an expense
     if (!newExpense) {
       setError('Expense description is required')
       return
@@ -87,7 +88,7 @@ const expense = () => {
       return
     }
 
-    try {
+    try { //try to add the expense
       const payerId = newPayer || user.uid
 
       let payerName = ''
@@ -98,16 +99,16 @@ const expense = () => {
         payerName = payer ? `${payer.firstName} ${payer.lastName}` : 'Unknown'
       }
 
-      const newExpenseData = {
+      const newExpenseData = { //data for the new expense
         description: newExpense,
         amount: parseFloat(newAmount),
         payerId: payerId,
         payerName: payerName,
-        date: newDate || new Date().toISOString().split('T')[0],
+        date: newDate || new Date().toISOString().split('T')[0], // Default to today
         createdAt: new Date().toISOString(),
         createdBy: user.uid,
-        householdIds: roommates,
-        settled: false
+        householdIds: roommates, // All roommates in the household
+        settled: false // Not settled by default
       }
       
       const docRef = await addDoc(collection(database, 'sharedExpenses'), newExpenseData)
@@ -126,7 +127,7 @@ const expense = () => {
   }
 
   
-  const toggleExpenseStatus = async (id, currentStatus) => {
+  const toggleExpenseStatus = async (id, currentStatus) => { //toggles the status of the expense
     try {
       await updateDoc(doc(database, 'sharedExpenses', id), {
         settled: !currentStatus
@@ -145,7 +146,7 @@ const expense = () => {
   }
 
   
-  const deleteExpense = async (id) => {
+  const deleteExpense = async (id) => { //deletes the expense
     try {
       await deleteDoc(doc(database, 'sharedExpenses', id))
       setExpenses(expenses.filter(expense => expense.id !== id))
@@ -204,14 +205,14 @@ const expense = () => {
                 />
                 <SelectInput
                   value={newPayer}
-                  onChange={(e) => setNewPayer(e.target.value)}
+                  onChange={(e) => setNewPayer(e.target.value)} 
                 >
                   <option value="">Paid by me</option>
-                  {roommateProfiles.map(roommate => (
+                  {roommateProfiles.map(roommate => ( //iterates through the roommates and adds them to the dropdown
                     <option key={roommate.id} value={roommate.id}>
-                      {roommate.firstName} {roommate.lastName}
+                      {roommate.firstName} {roommate.lastName}  
                     </option>
-                  ))}
+                  ))} 
                 </SelectInput>
                 <DateInput
                   type="date"
@@ -236,14 +237,14 @@ const expense = () => {
                     <ExpenseItem key={expense.id} settled={expense.settled}>
                       <ExpenseCheckbox 
                         checked={expense.settled}
-                        onChange={() => toggleExpenseStatus(expense.id, expense.settled)}
+                        onChange={() => toggleExpenseStatus(expense.id, expense.settled)} //toggles the status of the expense
                       />
                       <ExpenseDetails>
                         <ExpenseDescription settled={expense.settled}>
                           {expense.description}
                         </ExpenseDescription>
                         <ExpenseAmount settled={expense.settled}>
-                          ${expense.amount.toFixed(2)}
+                          ${expense.amount.toFixed(2)} //formats the amount to 2 decimal places
                         </ExpenseAmount>
                         <ExpenseMetadata>
                           <ExpensePayer>

@@ -67,7 +67,7 @@ const CreateProfile = () => {
     "University of Florida",
     "University of Washington"
   ]
-
+  //all of the above is data 
   useEffect(() => {
     if (!user) {
       router.push('/auth/login')
@@ -89,6 +89,7 @@ const CreateProfile = () => {
     }
   }, [])
 
+  //fetchUniversities function is used to fetch universities from the API
   const fetchUniversities = async (query) => {
     if (!query || query.length < 2) return 
     
@@ -114,7 +115,7 @@ const CreateProfile = () => {
     const query = e.target.value
     setUniversitySearch(query)
     
-    if (query.length < 2) {
+    if (query.length < 2) { //if the query is less than 2 characters, it will show the popular universities
       setFilteredUniversities(popularUniversities)
       return
     }
@@ -131,13 +132,13 @@ const CreateProfile = () => {
     return () => clearTimeout(handler)
   }
 
-  const handleUniversitySelect = (selected) => {
+  const handleUniversitySelect = (selected) => { //this function is used to select the university
     setUniversity(selected)
     setUniversitySearch(selected)
     setShowUniversityDropdown(false)
   }
 
-  const handlePictureChange = (e) => {
+  const handlePictureChange = (e) => { //this function is used to change the profile picture
     const file = e.target.files[0]
     if (!file.type.match('image.*')) {
       setError('Only image files are allowed.')
@@ -164,7 +165,7 @@ const CreateProfile = () => {
     return true
   }
 
-  const calculateAge = (birthdate) => {
+  const calculateAge = (birthdate) => { //this function is used to calculate the age
     const today = new Date()
     const birthDate = new Date(birthdate)
     let age = today.getFullYear() - birthDate.getFullYear()
@@ -175,7 +176,7 @@ const CreateProfile = () => {
     return age
   }
 
-  const handleSubmitProfile = async () => {
+  const handleSubmitProfile = async () => { //this function is used to submit the profile
     if (!user || !user.uid) {
       setError('You need to be logged in')
       router.push('/auth/login')
@@ -194,7 +195,7 @@ const CreateProfile = () => {
         profileImageUrl = await getDownloadURL(storageRef)
       }
 
-      const userProfileData = {
+      const userProfileData = { //this is the data that will be stored in the database
         firstName,
         lastName,
         birthday,
@@ -390,7 +391,7 @@ const CreateProfile = () => {
   )
 }
 
-const ProfileImage = ({ src, alt }) => (
+const ProfileImage = ({ src, alt }) => ( //this is the profile image component
   <img src={src} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 )
 
@@ -525,7 +526,7 @@ const DropdownItem = styled.div`
   color: white;
   cursor: pointer;
   &:hover {
-    background-color: ${props => props.disabled ? 'transparent' : 'rgba(255, 107, 107, 0.1)'};
+    background-color: ${props => props.disabled ? 'transparent' : 'rgba(255, 107, 107, 0.1)'}; //if the dropdown item is disabled, the background color will be transparent
   }
   
 `;
