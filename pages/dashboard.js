@@ -151,7 +151,7 @@ export default function Dashboard() {
             <DashboardCard>
               <CardIcon>🍹</CardIcon>
               <CardTitle>Random Cocktail</CardTitle>
-              <CardDescription>Discover a random drink recipe for your next roomie night</CardDescription>
+              <CardDescription>Drink ideas with a roommate!</CardDescription>
               <CocktailButton onClick={fetchRandomCocktail}>
                 {loading ? 'Loading...' : 'Generate Random Cocktail'}
               </CocktailButton>
@@ -218,7 +218,7 @@ export default function Dashboard() {
               ) : (
                 <NoRoommates>
                   You don't have any roommates yet
-                  <RoommateButton href="/Roommate/roommatematching">Find Roommates</RoommateButton>
+                  <RoommateButton href="/features/roommatematching">Find Roommates</RoommateButton>
                 </NoRoommates>
               )}
               </RoommateCards>
