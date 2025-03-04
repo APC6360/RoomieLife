@@ -32,7 +32,7 @@ const Navbar = () => {
           <ButtonLink href="/dashboard">Dashboard</ButtonLink>
           <ButtonLink href="/features/roommatematching">Roommate Matching</ButtonLink>
           <ButtonLink href='/features/choresmain'>Chores</ButtonLink>
-          <ButtonLink href='/features/expenses'>Expenses</ButtonLink>
+          <ButtonLink href='/features/expense'>Expenses</ButtonLink>
           <ButtonLinkasButton onClick={handleLogout}>Logout</ButtonLinkasButton>
           </>
         ) : (

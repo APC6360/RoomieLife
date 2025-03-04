@@ -65,7 +65,8 @@ const CreateProfile = () => {
     "University of Texas at Austin",
     "New York University",
     "University of Florida",
-    "University of Washington"
+    "University of Washington",
+    "Pennsylvania State University"
   ]
   //all of the above is data 
   useEffect(() => {
